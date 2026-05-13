@@ -29,11 +29,15 @@
       <div><strong>Turno:</strong> <span class="badge bg-primary" id="lblTurno"></span></div>
     </div>
   </div></div></div>
-  <div class="card mb-3 text-white" style="background:#1a3a6c;">
+  <div class="card mb-3 text-white" style="background:#1a3a6c;" id="cardContador">
     <div class="card-body text-center py-3">
-      <div class="small mb-1">Asistentes escaneados</div>
+      <div class="small mb-1">Asistentes registrados</div>
       <div style="font-size:3rem; font-weight:bold; line-height:1;" id="contador">0</div>
       <div class="small mt-1">de <span id="cantidadEsperada">0</span> esperados</div>
+      <div class="mt-2">
+        <span class="badge bg-success me-1">QR: <span id="contadorQR">0</span></span>
+        <span class="badge bg-warning text-dark">Manual: <span id="contadorManual">0</span></span>
+      </div>
     </div>
   </div>
   <div id="cardPreparando" class="card mb-3"><div class="card-body text-center py-3">
@@ -64,6 +68,34 @@
   <div id="cardError" class="card border-danger mt-3" style="display:none;"><div class="card-body text-danger">
     <strong>Error</strong><p id="lblErrorMsg" class="mb-0"></p>
   </div></div>
+  <button class="btn btn-warning w-100 mt-2" id="btnBuscarManual">
+    <strong>+</strong> Ingresar DNI manualmente (fotocheck danado)
+  </button>
+  
+  <!-- Modal busqueda manual -->
+  <div class="modal fade" id="modalManual" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header" style="background:#ffc107;">
+          <h5 class="modal-title">Buscar DNI manualmente</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body">
+          <label class="form-label">DNI del trabajador (8 digitos)</label>
+          <input type="text" inputmode="numeric" pattern="[0-9]*" maxlength="8" 
+                 class="form-control form-control-lg text-center fs-3" id="inputDniManual"
+                 placeholder="00000000" style="letter-spacing:5px;">
+          <div id="msgManual" class="mt-2 small"></div>
+          <div id="resultadoManual" class="mt-3" style="display:none;"></div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+          <button type="button" class="btn btn-warning" id="btnBuscarDniManual">Buscar</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  
   <button id="btnFinalizar" class="btn btn-lg w-100 mt-3" style="display:none; background:#c8102e; color:white;">
     Finalizar Sesion
   </button>

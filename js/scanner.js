@@ -62,6 +62,86 @@ document.addEventListener('DOMContentLoaded', () => {
   cardPreparando.style.display = 'none';
   iniciarCamara();
   
+  // ===== BUSQUEDA MANUAL =====
+  document.getElementById('btnBuscarManual').addEventListener('click', () => {
+    document.getElementById('inputDniManual').value = '';
+    document.getElementById('msgManual').textContent = '';
+    document.getElementById('msgManual').className = 'mt-2 small';
+    document.getElementById('resultadoManual').style.display = 'none';
+    const modal = new bootstrap.Modal(document.getElementById('modalManual'));
+    modal.show();
+    setTimeout(() => document.getElementById('inputDniManual').focus(), 300);
+  });
+  
+  document.getElementById('inputDniManual').addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      buscarDniManual();
+    }
+  });
+  
+  document.getElementById('btnBuscarDniManual').addEventListener('click', buscarDniManual);
+  
+  async function buscarDniManual() {
+    const input = document.getElementById('inputDniManual');
+    const msg = document.getElementById('msgManual');
+    const resultado = document.getElementById('resultadoManual');
+    
+    const dni = String(input.value).trim().padStart(8, '0');
+    if (dni.length !== 8 || !/^\d{8}$/.test(dni)) {
+      msg.textContent = 'DNI invalido. Ingresa 8 digitos numericos.';
+      msg.className = 'mt-2 small text-danger';
+      return;
+    }
+    
+    if (dnisRegistrados.has(dni)) {
+      msg.textContent = 'Este DNI ya fue registrado en esta sesion';
+      msg.className = 'mt-2 small text-warning fw-bold';
+      return;
+    }
+    
+    msg.textContent = 'Buscando...';
+    msg.className = 'mt-2 small text-muted';
+    
+    const resp = await API.validarTrabajador(dni);
+    
+    if (!resp.ok) {
+      msg.textContent = 'No encontrado: ' + (resp.error || dni);
+      msg.className = 'mt-2 small text-danger';
+      return;
+    }
+    
+    // Mostrar info encontrada
+    const t = resp.trabajador;
+    resultado.style.display = 'block';
+    resultado.innerHTML = '<div class="card border-success"><div class="card-body py-2">' +
+      '<strong>' + (t.nombre || '-') + '</strong><br>' +
+      '<small>DNI: ' + t.dni + ' | Ruta: ' + (t.ruta || '-') + ' | Empresa: ' + t.empresa + '</small><br>' +
+      '<button class="btn btn-success btn-sm mt-2" id="btnConfirmarManual">Confirmar y registrar</button>' +
+      '</div></div>';
+    msg.textContent = '';
+    
+    document.getElementById('btnConfirmarManual').addEventListener('click', () => {
+      const nuevaAsist = {
+        dni: t.dni,
+        nombre: t.nombre,
+        empresa: t.empresa,
+        ruta_trabajador: t.ruta,
+        tipoRegistro: 'MANUAL'
+      };
+      dnisRegistrados.add(t.dni);
+      asistencias.push(nuevaAsist);
+      sessionStorage.setItem('planta_asistencias', JSON.stringify(asistencias));
+      actualizarContador();
+      beep(880, 120, 0.2);
+      if (navigator.vibrate) navigator.vibrate(80);
+      guardarAsistenciaIndividual(nuevaAsist);
+      
+      // Cerrar modal
+      bootstrap.Modal.getInstance(document.getElementById('modalManual')).hide();
+    });
+  }
+  
   function iniciarCamara() {
     reader.style.display = 'block';
     try {
@@ -151,6 +231,17 @@ document.addEventListener('DOMContentLoaded', () => {
   function actualizarContador() {
     document.getElementById('contador').textContent = asistencias.length;
     btnFinalizar.style.display = asistencias.length > 0 ? 'block' : 'none';
+    
+    // Contar QR vs Manual
+    let qr = 0, manual = 0;
+    for (const a of asistencias) {
+      if (a.tipoRegistro === 'MANUAL') manual++;
+      else qr++;
+    }
+    const elQR = document.getElementById('contadorQR');
+    const elMan = document.getElementById('contadorManual');
+    if (elQR) elQR.textContent = qr;
+    if (elMan) elMan.textContent = manual;
   }
   
   function mostrarTrabajador(t) {
