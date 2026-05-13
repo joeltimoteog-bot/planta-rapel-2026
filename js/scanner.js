@@ -43,7 +43,6 @@ document.addEventListener('DOMContentLoaded', () => {
   document.getElementById('lblZonaPacking').textContent = config.zonaPacking;
   document.getElementById('lblEncargado').textContent = config.encargadoNombre;
   document.getElementById('cantidadEsperada').textContent = config.cantidadAsistente;
-  actualizarContador();
   
   const cardPreparando = document.getElementById('cardPreparando');
   const cardBuscando = document.getElementById('cardBuscando');
@@ -51,6 +50,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const cardError = document.getElementById('cardError');
   const reader = document.getElementById('reader');
   const btnFinalizar = document.getElementById('btnFinalizar');
+  actualizarContador();
   
   btnFinalizar.addEventListener('click', finalizar);
   document.getElementById('btnNuevaSesion').addEventListener('click', () => {
