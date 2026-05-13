@@ -1,114 +1,81 @@
 ﻿<!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <meta name="theme-color" content="#c8102e">
-  <title>Scanner QR - Planta Rapel 2026</title>
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-  <link href="css/styles.css" rel="stylesheet">
-  <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Scanner QR - Planta Rapel 2026</title>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+<script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
+<link rel="stylesheet" href="css/styles.css">
 </head>
 <body>
-  <nav class="navbar navbar-dark" style="background:#1a3a6c;">
-    <div class="container-fluid">
-      <span class="navbar-brand mb-0 h6 d-flex align-items-center">
-        <img src="assets/logo-unifrutti.png" alt="Unifrutti" class="logo-navbar" onerror="this.style.display='none';">
-        Scanner QR
-      </span>
-      <a href="config.html" class="btn btn-sm btn-outline-light">Cambiar</a>
-    </div>
-  </nav>
-  
-  <div class="container py-3">
-    
-    <!-- Tarjeta info de la ruta -->
-    <div class="card mb-3 shadow-sm" style="background:#f8f9fa;">
-      <div class="card-body py-2">
-        <div class="row g-1 small">
-          <div class="col-6"><strong>Ruta:</strong> <span id="lblRuta">-</span></div>
-          <div class="col-6"><strong>Bus:</strong> <span id="lblBus">-</span></div>
-          <div class="col-6"><strong>Placa:</strong> <span id="lblPlaca">-</span></div>
-          <div class="col-6"><strong>Turno:</strong> <span class="badge bg-dark" id="lblTurno">-</span></div>
-          <div class="col-12 mt-1"><strong>Zona:</strong> <span id="lblZonaPacking">-</span></div>
-          <div class="col-12 mt-1 text-muted"><small><strong>Encargado:</strong> <span id="lblEncargado">-</span></small></div>
-        </div>
-      </div>
-    </div>
-    
-    <!-- Contador GRANDE -->
-    <div class="card mb-3 shadow-sm" style="background:#1a3a6c; color:white;">
-      <div class="card-body text-center py-3">
-        <p class="mb-1 small">Asistentes escaneados</p>
-        <h1 class="mb-0 display-3 fw-bold" id="contador">0</h1>
-        <p class="mb-0 small opacity-75">de <span id="cantidadEsperada">0</span> esperados</p>
-      </div>
-    </div>
-    
-    <div id="cardPreparando" class="card mb-3 shadow-sm">
-      <div class="card-body text-center py-3">
-        <div class="spinner-border spinner-border-sm text-primary me-2" role="status"></div>
-        <span>Preparando scanner...</span>
-      </div>
-    </div>
-    
-    <div id="reader" style="width: 100%; display:none;"></div>
-    
-    <div class="card mt-3 shadow-sm" id="cardBuscando" style="display:none;">
-      <div class="card-body py-2 text-center">
-        <div class="spinner-border spinner-border-sm text-primary me-2" role="status"></div>
-        <span class="small">Buscando trabajador...</span>
-      </div>
-    </div>
-    
-    <div class="card mt-3 shadow-sm" id="cardResultado" style="display:none;">
-      <div class="card-body py-3">
-        <div class="d-flex justify-content-between align-items-start mb-2">
-          <h5 class="mb-0" id="lblNombre" style="color:#1a3a6c;">-</h5>
-          <span class="badge" id="lblEmpresaTrab" style="background:#c8102e;">-</span>
-        </div>
-        <p class="mb-1 small"><strong>DNI:</strong> <span id="lblDni">-</span></p>
-        <p class="mb-1 small"><strong>Oficio:</strong> <span id="lblOficio">-</span></p>
-        <p class="mb-1 small"><strong>Ruta asignada:</strong> <span class="badge bg-primary" id="lblRutaTrab">-</span> <span class="badge bg-warning ms-1" id="lblWarningRuta" style="display:none;">!= sesion</span></p>
-        <p class="mb-0 small text-muted"><strong>Sector:</strong> <span id="lblZona">-</span></p>
-      </div>
-    </div>
-    
-    <div class="card mt-3 shadow-sm border-danger" id="cardError" style="display:none;">
-      <div class="card-body py-3">
-        <h5 class="mb-2 text-danger">No encontrado</h5>
-        <p class="mb-0 small" id="lblErrorMsg">-</p>
-      </div>
-    </div>
-    
-    <!-- Boton finalizar -->
-    <button class="btn btn-success btn-lg w-100 mt-3" id="btnFinalizar" style="display:none;">
-      Finalizar y Guardar Asistencias
-    </button>
-    
+<nav class="navbar navbar-dark" style="background:#1a3a6c;">
+  <div class="container-fluid">
+    <span class="navbar-brand">Scanner QR</span>
+    <button class="btn btn-sm btn-light" id="btnNuevaSesion">Cambiar</button>
   </div>
-  
-  <!-- Modal de exito -->
-  <div class="modal fade" id="modalExito" tabindex="-1" data-bs-backdrop="static">
-    <div class="modal-dialog modal-dialog-centered">
-      <div class="modal-content">
-        <div class="modal-header bg-success text-white">
-          <h5 class="modal-title">Asistencias Registradas</h5>
-        </div>
-        <div class="modal-body">
-          <p class="mb-2" id="lblMsgExito">-</p>
-        </div>
-        <div class="modal-footer">
-          <button type="button" class="btn btn-primary" id="btnNuevaSesion">Nueva Sesi&oacute;n</button>
-        </div>
-      </div>
+</nav>
+<div class="container my-3" style="max-width:600px;">
+  <div class="card mb-3"><div class="card-body py-2"><div class="row small">
+    <div class="col-6">
+      <div><strong>Ruta:</strong> <span id="lblRuta"></span></div>
+      <div><strong>Placa:</strong> <span id="lblPlaca"></span></div>
+      <div><strong>Zona:</strong> <span id="lblZonaPacking"></span></div>
+      <div><strong>Encargado:</strong> <span id="lblEncargado"></span></div>
+    </div>
+    <div class="col-6">
+      <div><strong>Bus:</strong> <span id="lblBus"></span></div>
+      <div><strong>Turno:</strong> <span class="badge bg-primary" id="lblTurno"></span></div>
+    </div>
+  </div></div></div>
+  <div class="card mb-3 text-white" style="background:#1a3a6c;">
+    <div class="card-body text-center py-3">
+      <div class="small mb-1">Asistentes escaneados</div>
+      <div style="font-size:3rem; font-weight:bold; line-height:1;" id="contador">0</div>
+      <div class="small mt-1">de <span id="cantidadEsperada">0</span> esperados</div>
     </div>
   </div>
-  
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-  <script src="js/config.js"></script>
-  <script src="js/api.js"></script>
-  <script src="js/auth.js"></script>
-  <script src="js/scanner.js"></script>
+  <div id="cardPreparando" class="card mb-3"><div class="card-body text-center py-3">
+    <div class="spinner-border spinner-border-sm text-primary me-2"></div>Preparando scanner...
+  </div></div>
+  <div id="reader" style="display:none;"></div>
+  <div id="cardBuscando" class="card mt-3" style="display:none;"><div class="card-body text-center py-3">
+    <div class="spinner-border spinner-border-sm text-primary me-2"></div>Buscando trabajador...
+  </div></div>
+  <div id="cardResultado" class="card border-success mt-3" style="display:none;"><div class="card-body">
+    <h5 class="card-title text-success mb-2">Trabajador registrado</h5>
+    <p class="mb-1"><strong id="lblNombre"></strong></p>
+    <p class="mb-1 small">DNI: <span id="lblDni"></span></p>
+    <p class="mb-1 small">Oficio: <span id="lblOficio"></span></p>
+    <p class="mb-1 small">Ruta: <span id="lblRutaTrab"></span> <span id="lblWarningRuta" class="badge bg-warning text-dark ms-2" style="display:none;">DISTINTA A LA RUTA DEL BUS</span></p>
+    <p class="mb-1 small">Zona: <span id="lblZona"></span></p>
+    <p class="mb-1 small">Empresa: <span id="lblEmpresaTrab"></span></p>
+    <small id="indicadorGuardado" class="d-block mt-2 fw-bold"></small>
+  </div></div>
+  <div id="cardDuplicado" class="card mt-3" style="display:none; background:#fff3cd; border:3px solid #c8102e;">
+    <div class="card-body text-center py-4">
+      <div style="font-size:3rem; line-height:1;">&#9888;</div>
+      <h3 class="text-danger fw-bold my-2">YA REGISTRADO</h3>
+      <p class="mb-1 fw-bold fs-5" id="lblDuplicadoNombre"></p>
+      <p class="mb-0 text-muted">DNI: <span id="lblDuplicadoDni"></span></p>
+    </div>
+  </div>
+  <div id="cardError" class="card border-danger mt-3" style="display:none;"><div class="card-body text-danger">
+    <strong>Error</strong><p id="lblErrorMsg" class="mb-0"></p>
+  </div></div>
+  <button id="btnFinalizar" class="btn btn-lg w-100 mt-3" style="display:none; background:#c8102e; color:white;">
+    Finalizar Sesion
+  </button>
+</div>
+<div class="modal fade" id="modalExito" tabindex="-1"><div class="modal-dialog modal-dialog-centered"><div class="modal-content">
+  <div class="modal-header bg-success text-white"><h5 class="modal-title">Sesion Finalizada</h5></div>
+  <div class="modal-body"><p id="lblMsgExito"></p></div>
+  <div class="modal-footer"><button type="button" class="btn btn-primary" data-bs-dismiss="modal" onclick="sessionStorage.removeItem('planta_asistencias'); sessionStorage.removeItem('planta_pendientes'); window.location.href='config.html';">Nueva Sesion</button></div>
+</div></div></div>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<script src="js/config.js"></script>
+<script src="js/api.js"></script>
+<script src="js/auth.js"></script>
+<script src="js/scanner.js"></script>
 </body>
 </html>
