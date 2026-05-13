@@ -1,4 +1,8 @@
-﻿document.addEventListener("DOMContentLoaded", function() {
+$utf8 = [System.Text.UTF8Encoding]::new($true)
+
+# === Reescribir login.js sin auto-submit ===
+$loginJs = @'
+document.addEventListener("DOMContentLoaded", function() {
   console.log("[login] DOM listo");
   
   if (typeof API === "undefined") { console.error("API no cargado"); return; }
@@ -92,3 +96,65 @@ function procesarRespLogin(resp, msg) {
     }
   }, 600);
 }
+'@
+
+[System.IO.File]::WriteAllText("C:\planta-rapel-2026\js\login.js", $loginJs, $utf8)
+Write-Host "login.js: SIN auto-submit del PIN" -ForegroundColor Green
+
+# === Agregar autocomplete=off al HTML + limpiar PIN al cambiar tab ===
+$htmlPath = "C:\planta-rapel-2026\index.html"
+$h = Get-Content $htmlPath -Raw
+
+$h = $h.Replace(
+  'class="pin-input" id="inputPin" placeholder="0000">',
+  'class="pin-input" id="inputPin" placeholder="0000" autocomplete="off" autocorrect="off" spellcheck="false">'
+)
+$h = $h.Replace(
+  'class="form-input" id="inputUser" placeholder="ej: jtimoteo">',
+  'class="form-input" id="inputUser" placeholder="ej: jtimoteo" autocomplete="off">'
+)
+$h = $h.Replace(
+  '<input type="password" class="form-input" id="inputPass">',
+  '<input type="password" class="form-input" id="inputPass" autocomplete="new-password">'
+)
+
+# Agregar script para limpiar PIN al cambiar de tab
+$cleanScript = @'
+
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+  var tabs = document.querySelectorAll('[data-bs-toggle="tab"]');
+  tabs.forEach(function(t) {
+    t.addEventListener('shown.bs.tab', function(e) {
+      var href = e.target.getAttribute('href');
+      if (href === '#tabAdmin') {
+        var p = document.getElementById('inputPin'); if (p) p.value = '';
+        var u = document.getElementById('inputUser'); if (u) setTimeout(function(){u.focus();}, 50);
+      } else {
+        var us = document.getElementById('inputUser'); if (us) us.value = '';
+        var ps = document.getElementById('inputPass'); if (ps) ps.value = '';
+      }
+    });
+  });
+});
+</script>
+
+'@
+
+if ($h -notmatch 'shown\.bs\.tab') {
+  $h = $h.Replace('</body>', $cleanScript + '</body>')
+}
+
+[System.IO.File]::WriteAllText($htmlPath, $h, $utf8)
+Write-Host "index.html: autocomplete OFF + limpieza al cambiar tab" -ForegroundColor Green
+
+# Update version
+$version = (Get-Date).ToString('yyyyMMdd-HHmmss')
+[System.IO.File]::WriteAllText("C:\planta-rapel-2026\version.json", "{`"version`": `"$version`"}", $utf8)
+
+git add .
+git commit -m "Fix: quitar auto-submit PIN + autocomplete off (no interfiere admin)"
+git push
+
+Write-Host ""
+Write-Host "LISTO - prueba ahora" -ForegroundColor Green

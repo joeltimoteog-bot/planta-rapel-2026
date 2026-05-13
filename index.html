@@ -154,16 +154,16 @@
       <div class="tab-pane fade show active" id="tabEnc">
         <label class="form-label-bold">Ingresa tu PIN de 4 d&iacute;gitos</label>
         <input type="text" inputmode="numeric" pattern="[0-9]*" maxlength="4"
-               class="pin-input" id="inputPin" placeholder="0000">
+               class="pin-input" id="inputPin" placeholder="0000" autocomplete="off" autocorrect="off" spellcheck="false">
         <button class="btn-ingresar" id="btnLoginPin">INGRESAR</button>
         <div class="mensaje" id="msgPin"></div>
       </div>
       
       <div class="tab-pane fade" id="tabAdmin">
         <label class="form-label-bold">USUARIO</label>
-        <input type="text" class="form-input" id="inputUser" placeholder="ej: jtimoteo">
+        <input type="text" class="form-input" id="inputUser" placeholder="ej: jtimoteo" autocomplete="off">
         <label class="form-label-bold">CONTRASE&Ntilde;A</label>
-        <input type="password" class="form-input" id="inputPass">
+        <input type="password" class="form-input" id="inputPass" autocomplete="new-password">
         <button class="btn-ingresar" id="btnLogin">INGRESAR</button>
         <div class="mensaje" id="msgLogin"></div>
       </div>
@@ -179,5 +179,23 @@
 <script src="js/api.js"></script>
 <script src="js/auth.js"></script>
 <script src="js/login.js"></script>
+
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+  var tabs = document.querySelectorAll('[data-bs-toggle="tab"]');
+  tabs.forEach(function(t) {
+    t.addEventListener('shown.bs.tab', function(e) {
+      var href = e.target.getAttribute('href');
+      if (href === '#tabAdmin') {
+        var p = document.getElementById('inputPin'); if (p) p.value = '';
+        var u = document.getElementById('inputUser'); if (u) setTimeout(function(){u.focus();}, 50);
+      } else {
+        var us = document.getElementById('inputUser'); if (us) us.value = '';
+        var ps = document.getElementById('inputPass'); if (ps) ps.value = '';
+      }
+    });
+  });
+});
+</script>
 </body>
 </html>
