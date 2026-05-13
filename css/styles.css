@@ -3,6 +3,12 @@
   --unifrutti-blue: #1a3a6c;
   --unifrutti-light: #f5f5f5;
 }
+* {
+  font-family: 'Tahoma', Geneva, Verdana, sans-serif;
+}
+body {
+  font-size: 10pt;
+}
 body.bg-login {
   background: linear-gradient(135deg, #e8eef7 0%, #f5f5f5 100%);
   min-height: 100vh;
@@ -18,22 +24,14 @@ body.bg-login {
   background: linear-gradient(135deg, #c8102e 0%, #a00d24 100%);
   border-bottom: none;
 }
-.logo-unifrutti {
-  width: 48px;
-  height: 48px;
-  background: white;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  position: relative;
+.logo-header {
+  max-height: 50px;
+  width: auto;
 }
-.logo-unifrutti::before {
-  content: '';
-  width: 14px;
-  height: 22px;
-  background: var(--unifrutti-red);
-  border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%;
+.logo-navbar {
+  max-height: 28px;
+  width: auto;
+  margin-right: 8px;
 }
 .btn-primary {
   background-color: var(--unifrutti-blue);
@@ -56,3 +54,12 @@ body.bg-login {
 }
 .text-danger { color: var(--unifrutti-red) !important; }
 .card-footer { background: var(--unifrutti-light); }
+
+/* Scanner */
+#reader {
+  border-radius: 12px;
+  overflow: hidden;
+}
+#reader video {
+  border-radius: 12px;
+}

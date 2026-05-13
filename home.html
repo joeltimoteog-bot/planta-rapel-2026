@@ -11,19 +11,29 @@
 <body>
   <nav class="navbar navbar-dark" style="background:#1a3a6c;">
     <div class="container-fluid">
-      <span class="navbar-brand mb-0 h6">Planta Rapel 2026</span>
+      <span class="navbar-brand mb-0 h6 d-flex align-items-center">
+        <img src="assets/logo-unifrutti.png" alt="Unifrutti" class="logo-navbar" onerror="this.style.display='none';">
+        Planta Rapel 2026
+      </span>
       <button class="btn btn-sm btn-outline-light" id="btnLogout">Cerrar sesi&oacute;n</button>
     </div>
   </nav>
   <div class="container py-4">
-    <div class="card shadow-sm">
-      <div class="card-body text-center py-5">
-        <h3 class="mb-3" style="color:#1a3a6c;">Bienvenido</h3>
-        <p class="lead mb-2" id="lblNombre">-</p>
-        <p class="text-muted mb-0">
+    <div class="card shadow-sm mb-3">
+      <div class="card-body text-center py-4">
+        <h4 class="mb-2" style="color:#1a3a6c;">Bienvenido</h4>
+        <p class="lead mb-1" id="lblNombre">-</p>
+        <p class="text-muted mb-3" id="lblCargo">-</p>
+        <p class="mb-0">
           <span class="badge bg-secondary me-2" id="lblRol">-</span>
           <span class="badge" id="lblEmpresa" style="background:#c8102e;">-</span>
         </p>
+      </div>
+    </div>
+    <div class="card shadow-sm">
+      <div class="card-body">
+        <h6 class="mb-3" style="color:#1a3a6c;">Acciones</h6>
+        <a href="scanner.html" class="btn btn-primary w-100 mb-2">Abrir Scanner QR</a>
       </div>
     </div>
   </div>
