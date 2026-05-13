@@ -17,5 +17,6 @@
     }
   },
   login(username, password) { return this.call('login', { username, password }); },
+  validarTrabajador(dni, empresa) { return this.call('validarTrabajador', { dni, empresa }); },
   ping() { return this.call('ping'); }
 };
