@@ -5,7 +5,7 @@ document.addEventListener('DOMContentLoaded', () => {
   if (!Auth.requiereLogin()) return;
   
   const usuario = (function(){try{const r=localStorage.getItem('planta_usuario')||localStorage.getItem('usuario');return r?JSON.parse(r):null;}catch(e){return null;}})();
-  if (!usuario || usuario.rol !== 'admin') {
+  console.log('Usuario en localStorage:', usuario); if (usuario && usuario.rol && usuario.rol !== 'admin') {
     alert('Solo administradores pueden ver el dashboard');
     window.location.href = 'home.html';
     return;
