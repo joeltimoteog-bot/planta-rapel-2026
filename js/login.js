@@ -1,4 +1,7 @@
 ﻿document.addEventListener('DOMContentLoaded', () => {
+  // Pre-warm Apps Script mientras usuario tipea (despierta servidor)
+  API.ping().catch(() => {});
+  API.validarTrabajador('00000000').catch(() => {});
   const sesion = Auth.obtenerSesion();
   if (sesion) {
     Auth.redireccionarSegunRol(sesion);
