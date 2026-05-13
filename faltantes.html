@@ -1,0 +1,69 @@
+﻿<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Registrar Faltantes - Planta Rapel 2026</title>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+<link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+<nav class="navbar navbar-dark" style="background:#c8102e;">
+  <div class="container-fluid">
+    <span class="navbar-brand">Registrar Faltantes</span>
+    <button class="btn btn-sm btn-light" id="btnVolver">Volver al Scanner</button>
+  </div>
+</nav>
+
+<div class="container my-3" style="max-width:900px;">
+  <div class="card mb-3"><div class="card-body py-2"><div class="row small">
+    <div class="col-6">
+      <div><strong>Ruta:</strong> <span id="lblRuta"></span></div>
+      <div><strong>Bus:</strong> <span id="lblBus"></span></div>
+      <div><strong>Encargado:</strong> <span id="lblEncargado"></span></div>
+    </div>
+    <div class="col-6">
+      <div><strong>Turno:</strong> <span class="badge bg-primary" id="lblTurno"></span></div>
+      <div><strong>Asistencias OK:</strong> <span id="lblAsistencias"></span></div>
+      <div><strong>Faltantes a registrar:</strong> <span class="badge bg-danger" id="lblFaltan"></span></div>
+    </div>
+  </div></div></div>
+  
+  <div class="alert alert-warning">
+    <strong>Instrucciones:</strong> Ingresa el DNI de cada trabajador faltante, selecciona el motivo, y agrega una observación si es necesario. El sistema buscará automáticamente el nombre al ingresar el DNI.
+  </div>
+  
+  <div class="table-responsive">
+    <table class="table table-bordered table-sm align-middle">
+      <thead style="background:#1a3a6c; color:white;">
+        <tr>
+          <th>#</th>
+          <th>DNI</th>
+          <th>Nombre</th>
+          <th>Empresa</th>
+          <th>Motivo</th>
+          <th>Observacion</th>
+        </tr>
+      </thead>
+      <tbody id="tablaFaltantes"></tbody>
+    </table>
+  </div>
+  
+  <button id="btnConfirmar" class="btn btn-lg w-100 mt-3" style="background:#c8102e; color:white;">
+    Confirmar Faltantes y Finalizar Sesion
+  </button>
+</div>
+
+<div class="modal fade" id="modalExito" tabindex="-1"><div class="modal-dialog modal-dialog-centered"><div class="modal-content">
+  <div class="modal-header bg-success text-white"><h5 class="modal-title">Sesion Finalizada</h5></div>
+  <div class="modal-body"><p id="lblMsgExito"></p></div>
+  <div class="modal-footer"><button type="button" class="btn btn-primary" data-bs-dismiss="modal" onclick="sessionStorage.clear(); window.location.href='config.html';">Nueva Sesion</button></div>
+</div></div></div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<script src="js/config.js"></script>
+<script src="js/api.js"></script>
+<script src="js/auth.js"></script>
+<script src="js/faltantes.js"></script>
+</body>
+</html>

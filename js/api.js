@@ -1,23 +1,32 @@
-﻿const API = {
-  async call(accion, params = {}) {
-    if (!CONFIG.API_URL || CONFIG.API_URL.startsWith('PEGAR')) {
-      return { ok: false, error: 'API_URL no configurada en config.js' };
-    }
-    try {
-      const response = await fetch(CONFIG.API_URL, {
-        method: 'POST',
-        mode: 'cors',
-        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-        body: JSON.stringify({ accion, ...params })
-      });
-      return await response.json();
-    } catch (err) {
-      console.error('API error:', err);
-      return { ok: false, error: 'Error de conexion: ' + err.message };
-    }
-  },
-  login(username, password) { return this.call('login', { username, password }); },
-  validarTrabajador(dni, empresa) { return this.call('validarTrabajador', { dni, empresa }); },
-  registrarAsistencias(asistencias, sesion) { return this.call('registrarAsistencias', { asistencias, sesion }); },
-  ping() { return this.call('ping'); }
+﻿const API_URL = window.API_URL || 'https://script.google.com/macros/s/AKfycbxWIgvJzcVIzBA_9tUQqcjCLrcBoENDV9l2c2vD5FLLAAaw6OaVUUZJZu3kRwm2N0yo/exec';
+
+async function post(payload) {
+  try {
+    const r = await fetch(API_URL, {
+      method: 'POST',
+      mode: 'cors',
+      cache: 'no-cache',
+      headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+      body: JSON.stringify(payload)
+    });
+    return await r.json();
+  } catch (e) {
+    return { ok: false, error: 'Error de red: ' + e.message };
+  }
+}
+
+function extraerSesion(s) {
+  return {
+    ruta: s.ruta, codigoBus: s.codigoBus, placa: s.placa,
+    zonaPacking: s.zonaPacking, turno: s.turno,
+    encargadoDni: s.encargadoDni, encargadoNombre: s.encargadoNombre
+  };
+}
+
+const API = {
+  ping: () => post({ accion: 'ping' }),
+  login: (username, password) => post({ accion: 'login', username, password }),
+  validarTrabajador: (dni, empresa) => post({ accion: 'validarTrabajador', dni, empresa }),
+  registrarAsistencias: (asistencias, sesion) => post({ accion: 'registrarAsistencias', asistencias, sesion: extraerSesion(sesion) }),
+  registrarFaltantes: (faltantes, sesion) => post({ accion: 'registrarFaltantes', faltantes, sesion: extraerSesion(sesion) })
 };
