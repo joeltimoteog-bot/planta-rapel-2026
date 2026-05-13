@@ -1,62 +1,86 @@
-﻿document.addEventListener('DOMContentLoaded', async () => {
+﻿// Helper para beep de feedback al escanear
+function beep(freq, duration, volume) {
+  try {
+    const ctx = new (window.AudioContext || window.webkitAudioContext)();
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+    osc.connect(gain);
+    gain.connect(ctx.destination);
+    osc.frequency.value = freq || 880;
+    osc.type = 'sine';
+    gain.gain.value = volume || 0.2;
+    osc.start();
+    setTimeout(() => {
+      osc.stop();
+      ctx.close();
+    }, duration || 120);
+  } catch (e) {
+    console.warn('Beep no soportado:', e);
+  }
+}
+
+document.addEventListener('DOMContentLoaded', async () => {
   if (!Auth.requiereLogin()) return;
   
-  // Limpiar cache previo de la base (legacy)
-  ['RAPEL', 'VERFRUT'].forEach(emp => {
-    localStorage.removeItem('planta_base_' + emp);
-    localStorage.removeItem('planta_base_ts_' + emp);
-  });
-  
-  // Obtener config de bus de la sesion
   const config = BusConfig.obtener();
   if (!config) {
-    // Si no hay config, mandar a configurar
     window.location.href = 'config.html';
     return;
   }
   
-  let contador = 0;
   let ultimoDni = null;
   let ultimoTimestamp = 0;
   let procesando = false;
+  let dnisRegistrados = new Set();
+  let asistencias = [];
   
-  // Mostrar info de la ruta arriba
+  // Recuperar asistencias previas si hay (sobrevive refresh)
+  const previas = sessionStorage.getItem('planta_asistencias');
+  if (previas) {
+    try {
+      asistencias = JSON.parse(previas);
+      asistencias.forEach(a => dnisRegistrados.add(a.dni));
+    } catch (e) {}
+  }
+  
+  // Mostrar info de la sesion
   document.getElementById('lblRuta').textContent = config.ruta;
   document.getElementById('lblBus').textContent = config.codigoBus;
   document.getElementById('lblPlaca').textContent = config.placa;
-  document.getElementById('lblPacking').textContent = config.empresa;
+  document.getElementById('lblTurno').textContent = config.turno;
+  document.getElementById('lblZonaPacking').textContent = config.zonaPacking;
   document.getElementById('lblEncargado').textContent = config.encargadoNombre;
-  document.getElementById('lblProgreso').textContent = '0 / ' + config.cantidadEsperada;
+  document.getElementById('cantidadEsperada').textContent = config.cantidadAsistente;
+  actualizarContador();
   
   const cardPreparando = document.getElementById('cardPreparando');
   const cardBuscando = document.getElementById('cardBuscando');
   const cardResultado = document.getElementById('cardResultado');
   const cardError = document.getElementById('cardError');
   const reader = document.getElementById('reader');
+  const btnFinalizar = document.getElementById('btnFinalizar');
   
-  // Warm-up
+  btnFinalizar.addEventListener('click', finalizar);
+  document.getElementById('btnNuevaSesion').addEventListener('click', () => {
+    sessionStorage.removeItem('planta_asistencias');
+    BusConfig.limpiar();
+    window.location.href = 'config.html';
+  });
+  
   await API.ping();
-  
   cardPreparando.style.display = 'none';
   iniciarCamara();
   
   function iniciarCamara() {
     reader.style.display = 'block';
     const html5QrCode = new Html5Qrcode("reader");
-    const cfgQr = { 
-      fps: 10, 
-      qrbox: { width: 250, height: 250 },
-      aspectRatio: 1.0
-    };
+    const cfgQr = { fps: 10, qrbox: { width: 250, height: 250 }, aspectRatio: 1.0 };
     html5QrCode.start(
       { facingMode: "environment" },
       cfgQr,
       onScanSuccess,
       function() {}
-    ).catch(err => {
-      console.error('Error camara:', err);
-      alert('No se pudo iniciar la camara. Verifica permisos.');
-    });
+    ).catch(err => alert('Error camara: ' + err));
   }
   
   async function onScanSuccess(decodedText) {
@@ -71,26 +95,45 @@
     ultimoTimestamp = ahora;
     procesando = true;
     
-    if (navigator.vibrate) navigator.vibrate(100);
+    if (navigator.vibrate) navigator.vibrate(80);
     
     cardResultado.style.display = 'none';
     cardError.style.display = 'none';
     cardBuscando.style.display = 'block';
     
-    // BUSCA EN AMBAS BASES (no envia empresa)
     const resp = await API.validarTrabajador(dni);
-    
     cardBuscando.style.display = 'none';
     
     if (resp.ok) {
-      mostrarTrabajador(resp.trabajador);
-      contador++;
-      document.getElementById('lblProgreso').textContent = contador + ' / ' + config.cantidadEsperada;
+      // Si ya estaba registrado, avisar pero no duplicar
+      if (dnisRegistrados.has(resp.trabajador.dni)) {
+        mostrarError('Este trabajador ya fue escaneado en esta sesion');
+        beep(440, 200, 0.15); // tono mas grave (advertencia)
+      } else {
+        dnisRegistrados.add(resp.trabajador.dni);
+        asistencias.push({
+          dni: resp.trabajador.dni,
+          nombre: resp.trabajador.nombre,
+          empresa: resp.trabajador.empresa,
+          ruta_trabajador: resp.trabajador.ruta,
+          tipoRegistro: 'QR'
+        });
+        sessionStorage.setItem('planta_asistencias', JSON.stringify(asistencias));
+        mostrarTrabajador(resp.trabajador);
+        actualizarContador();
+        beep(880, 120, 0.2); // tono OK
+      }
     } else {
       mostrarError(resp.error || 'No encontrado');
+      beep(220, 300, 0.2); // tono error grave
     }
     
     procesando = false;
+  }
+  
+  function actualizarContador() {
+    document.getElementById('contador').textContent = asistencias.length;
+    btnFinalizar.style.display = asistencias.length > 0 ? 'block' : 'none';
   }
   
   function mostrarTrabajador(t) {
@@ -98,17 +141,12 @@
     document.getElementById('lblNombre').textContent = t.nombre || '-';
     document.getElementById('lblDni').textContent = t.dni || '-';
     document.getElementById('lblOficio').textContent = t.oficio || '-';
-    document.getElementById('lblRegimen').textContent = t.regimen || '-';
     document.getElementById('lblRutaTrab').textContent = t.ruta || 'SIN RUTA';
     document.getElementById('lblZona').textContent = t.zona || '-';
     document.getElementById('lblEmpresaTrab').textContent = t.empresa || '-';
-    document.getElementById('lblFechas').textContent = 
-      (t.fechaInicio || '?') + ' - ' + (t.fechaTermino || '?');
     
-    // Validacion suave: avisar si la ruta no coincide
     const warning = document.getElementById('lblWarningRuta');
     if (t.ruta && t.ruta.toUpperCase() !== config.ruta.toUpperCase()) {
-      warning.textContent = 'No es de ' + config.ruta;
       warning.style.display = 'inline';
     } else {
       warning.style.display = 'none';
@@ -118,5 +156,33 @@
   function mostrarError(msg) {
     cardError.style.display = 'block';
     document.getElementById('lblErrorMsg').textContent = msg;
+  }
+  
+  async function finalizar() {
+    if (!asistencias.length) return;
+    if (!confirm('Guardar ' + asistencias.length + ' asistencias?')) return;
+    
+    btnFinalizar.disabled = true;
+    btnFinalizar.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Guardando...';
+    
+    const resp = await API.registrarAsistencias(asistencias, config);
+    
+    if (!resp.ok) {
+      alert('Error al guardar: ' + (resp.error || 'desconocido'));
+      btnFinalizar.disabled = false;
+      btnFinalizar.innerHTML = 'Finalizar y Guardar Asistencias';
+      return;
+    }
+    
+    // Limpiar local
+    sessionStorage.removeItem('planta_asistencias');
+    
+    // Mensaje de exito
+    const msg = 'Has registrado ' + resp.cantidad + ' asistencias de la ruta ' + 
+                resp.ruta + ' - codigo ' + resp.codigoBus + ' - fecha ' + resp.fecha;
+    document.getElementById('lblMsgExito').textContent = msg;
+    
+    const modal = new bootstrap.Modal(document.getElementById('modalExito'));
+    modal.show();
   }
 });

@@ -14,7 +14,6 @@
     if (confirm('Salir de la sesion?')) Auth.cerrarSesion();
   });
   
-  // Validar DNI del encargado al perder foco
   inputDni.addEventListener('blur', async () => {
     const dni = inputDni.value.trim();
     if (dni.length < 8) {
@@ -30,11 +29,10 @@
     msgError.classList.add('d-none');
     cardEncargado.classList.add('d-none');
     
-    // Buscar en AMBAS bases (sin especificar empresa)
     const resp = await API.validarTrabajador(dniNorm);
     
     if (!resp.ok) {
-      mostrarError('DNI no encontrado en ninguna base. Verifique el numero.');
+      mostrarError('DNI no encontrado en ninguna base.');
       encargadoValidado = null;
       return false;
     }
@@ -49,14 +47,15 @@
     e.preventDefault();
     msgError.classList.add('d-none');
     
-    const empresa = document.getElementById('empresa').value;
+    const zonaPacking = document.getElementById('zonaPacking').value;
+    const turno = document.getElementById('turno').value;
     const ruta = document.getElementById('ruta').value.trim().toUpperCase();
     const codigoBus = document.getElementById('codigoBus').value.trim().toUpperCase();
     const placa = document.getElementById('placa').value.trim().toUpperCase();
     const cantidad = parseInt(document.getElementById('cantidad').value);
     const dni = inputDni.value.trim();
     
-    if (!empresa || !ruta || !codigoBus || !placa || !cantidad || !dni) {
+    if (!zonaPacking || !turno || !ruta || !codigoBus || !placa || !cantidad || !dni) {
       mostrarError('Complete todos los campos');
       return;
     }
@@ -64,7 +63,6 @@
     btn.disabled = true;
     btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Validando...';
     
-    // Re-validar DNI si no estaba validado
     if (!encargadoValidado) {
       const ok = await validarDniEncargado(dni);
       if (!ok) {
@@ -74,18 +72,21 @@
       }
     }
     
-    // Guardar config en sessionStorage
     BusConfig.guardar({
-      empresa: empresa,
+      zonaPacking: zonaPacking,
+      turno: turno,
       ruta: ruta,
       codigoBus: codigoBus,
       placa: placa,
-      cantidadEsperada: cantidad,
+      cantidadAsistente: cantidad,
       encargadoDni: encargadoValidado.dni,
       encargadoNombre: encargadoValidado.nombre,
       encargadoEmpresa: encargadoValidado.empresa,
       iniciadoAt: new Date().toISOString()
     });
+    
+    // Limpiar asistencias previas
+    sessionStorage.removeItem('planta_asistencias');
     
     window.location.href = 'scanner.html';
   });

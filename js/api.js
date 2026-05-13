@@ -18,5 +18,6 @@
   },
   login(username, password) { return this.call('login', { username, password }); },
   validarTrabajador(dni, empresa) { return this.call('validarTrabajador', { dni, empresa }); },
+  registrarAsistencias(asistencias, sesion) { return this.call('registrarAsistencias', { asistencias, sesion }); },
   ping() { return this.call('ping'); }
 };

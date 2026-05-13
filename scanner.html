@@ -16,23 +16,32 @@
         <img src="assets/logo-unifrutti.png" alt="Unifrutti" class="logo-navbar" onerror="this.style.display='none';">
         Scanner QR
       </span>
-      <a href="config.html" class="btn btn-sm btn-outline-light">Cambiar config</a>
+      <a href="config.html" class="btn btn-sm btn-outline-light">Cambiar</a>
     </div>
   </nav>
   
   <div class="container py-3">
-    <!-- Tarjeta con info de la ruta -->
+    
+    <!-- Tarjeta info de la ruta -->
     <div class="card mb-3 shadow-sm" style="background:#f8f9fa;">
       <div class="card-body py-2">
-        <div class="row g-2 small">
+        <div class="row g-1 small">
           <div class="col-6"><strong>Ruta:</strong> <span id="lblRuta">-</span></div>
           <div class="col-6"><strong>Bus:</strong> <span id="lblBus">-</span></div>
           <div class="col-6"><strong>Placa:</strong> <span id="lblPlaca">-</span></div>
-          <div class="col-6"><strong>Packing:</strong> <span class="badge" id="lblPacking" style="background:#c8102e;">-</span></div>
+          <div class="col-6"><strong>Turno:</strong> <span class="badge bg-dark" id="lblTurno">-</span></div>
+          <div class="col-12 mt-1"><strong>Zona:</strong> <span id="lblZonaPacking">-</span></div>
+          <div class="col-12 mt-1 text-muted"><small><strong>Encargado:</strong> <span id="lblEncargado">-</span></small></div>
         </div>
-        <hr class="my-2">
-        <p class="mb-0 small text-muted"><strong>Encargado:</strong> <span id="lblEncargado">-</span></p>
-        <p class="mb-0 small"><strong>Progreso:</strong> <span id="lblProgreso">0 / 0</span></p>
+      </div>
+    </div>
+    
+    <!-- Contador GRANDE -->
+    <div class="card mb-3 shadow-sm" style="background:#1a3a6c; color:white;">
+      <div class="card-body text-center py-3">
+        <p class="mb-1 small">Asistentes escaneados</p>
+        <h1 class="mb-0 display-3 fw-bold" id="contador">0</h1>
+        <p class="mb-0 small opacity-75">de <span id="cantidadEsperada">0</span> esperados</p>
       </div>
     </div>
     
@@ -60,10 +69,8 @@
         </div>
         <p class="mb-1 small"><strong>DNI:</strong> <span id="lblDni">-</span></p>
         <p class="mb-1 small"><strong>Oficio:</strong> <span id="lblOficio">-</span></p>
-        <p class="mb-1 small"><strong>R&eacute;gimen:</strong> <span id="lblRegimen">-</span></p>
-        <p class="mb-1 small"><strong>Ruta asignada:</strong> <span class="badge bg-primary" id="lblRutaTrab">-</span> <span class="badge bg-danger ms-1" id="lblWarningRuta" style="display:none;">!=</span></p>
-        <p class="mb-1 small"><strong>Sector:</strong> <span id="lblZona">-</span></p>
-        <p class="mb-0 small text-muted"><strong>Contrato:</strong> <span id="lblFechas">-</span></p>
+        <p class="mb-1 small"><strong>Ruta asignada:</strong> <span class="badge bg-primary" id="lblRutaTrab">-</span> <span class="badge bg-warning ms-1" id="lblWarningRuta" style="display:none;">!= sesion</span></p>
+        <p class="mb-0 small text-muted"><strong>Sector:</strong> <span id="lblZona">-</span></p>
       </div>
     </div>
     
@@ -73,8 +80,32 @@
         <p class="mb-0 small" id="lblErrorMsg">-</p>
       </div>
     </div>
+    
+    <!-- Boton finalizar -->
+    <button class="btn btn-success btn-lg w-100 mt-3" id="btnFinalizar" style="display:none;">
+      Finalizar y Guardar Asistencias
+    </button>
+    
   </div>
   
+  <!-- Modal de exito -->
+  <div class="modal fade" id="modalExito" tabindex="-1" data-bs-backdrop="static">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header bg-success text-white">
+          <h5 class="modal-title">Asistencias Registradas</h5>
+        </div>
+        <div class="modal-body">
+          <p class="mb-2" id="lblMsgExito">-</p>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-primary" id="btnNuevaSesion">Nueva Sesi&oacute;n</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
   <script src="js/config.js"></script>
   <script src="js/api.js"></script>
   <script src="js/auth.js"></script>

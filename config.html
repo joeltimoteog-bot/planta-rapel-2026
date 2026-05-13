@@ -27,11 +27,30 @@
         
         <form id="formConfig" novalidate>
           <div class="mb-3">
-            <label class="form-label small fw-bold">Packing / Empresa</label>
-            <select class="form-select" id="empresa" required>
+            <label class="form-label small fw-bold">Zona / Packing</label>
+            <select class="form-select" id="zonaPacking" required>
               <option value="">Seleccione...</option>
-              <option value="RAPEL">RAPEL</option>
-              <option value="VERFRUT">VERFRUT</option>
+              <option value="PUV 01">PUV 01</option>
+              <option value="PUV 02">PUV 02</option>
+              <option value="PUV 03">PUV 03</option>
+              <option value="PUV 04">PUV 04</option>
+              <option value="PUV 05">PUV 05</option>
+              <option value="PUV 06">PUV 06</option>
+              <option value="PUV 07">PUV 07</option>
+              <option value="PUV 08">PUV 08</option>
+              <option value="ARANDANOS">ARANDANOS</option>
+              <option value="PALTA">PALTA</option>
+              <option value="LIMON">LIMON</option>
+              <option value="BODEGA FRIGORIFICOS">BODEGA FRIGORIFICOS</option>
+            </select>
+          </div>
+          
+          <div class="mb-3">
+            <label class="form-label small fw-bold">Turno</label>
+            <select class="form-select" id="turno" required>
+              <option value="">Seleccione...</option>
+              <option value="DIA">D&Iacute;A</option>
+              <option value="NOCHE">NOCHE</option>
             </select>
           </div>
           
@@ -51,7 +70,7 @@
           </div>
           
           <div class="mb-3">
-            <label class="form-label small fw-bold">Cantidad de personal esperado</label>
+            <label class="form-label small fw-bold">Cantidad de personal asistente</label>
             <input type="number" class="form-control" id="cantidad" placeholder="Ej: 50" min="1" max="200" required>
           </div>
           
@@ -60,7 +79,7 @@
           <div class="mb-3">
             <label class="form-label small fw-bold">DNI del Encargado</label>
             <input type="text" class="form-control" id="dniEncargado" placeholder="8 d&iacute;gitos" inputmode="numeric" maxlength="8" required>
-            <p class="text-muted small mt-1 mb-0">Se validar&aacute; contra la base y se registrar&aacute; como encargado de esta ruta</p>
+            <p class="text-muted small mt-1 mb-0">Se validar&aacute; contra la base y se registrar&aacute; como encargado</p>
           </div>
           
           <div id="msgError" class="alert alert-danger d-none py-2 small" role="alert"></div>
