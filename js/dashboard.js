@@ -213,6 +213,7 @@ function renderCharts(resumen) {
       options: {
         responsive: true,
         maintainAspectRatio: false,
+        animation: false,
         plugins: { legend: { display: false } },
         scales: { y: { beginAtZero: true, ticks: { stepSize: 1 } } }
       }
@@ -242,6 +243,7 @@ function renderCharts(resumen) {
       options: {
         responsive: true,
         maintainAspectRatio: false,
+        animation: false,
         plugins: { legend: { position: 'bottom' } }
       }
     });
