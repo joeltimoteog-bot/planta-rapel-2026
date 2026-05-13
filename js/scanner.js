@@ -1,5 +1,4 @@
-﻿// Helper para beep de feedback al escanear
-function beep(freq, duration, volume) {
+﻿function beep(freq, duration, volume) {
   try {
     const ctx = new (window.AudioContext || window.webkitAudioContext)();
     const osc = ctx.createOscillator();
@@ -10,16 +9,11 @@ function beep(freq, duration, volume) {
     osc.type = 'sine';
     gain.gain.value = volume || 0.2;
     osc.start();
-    setTimeout(() => {
-      osc.stop();
-      ctx.close();
-    }, duration || 120);
-  } catch (e) {
-    console.warn('Beep no soportado:', e);
-  }
+    setTimeout(() => { osc.stop(); ctx.close(); }, duration || 120);
+  } catch (e) {}
 }
 
-document.addEventListener('DOMContentLoaded', async () => {
+document.addEventListener('DOMContentLoaded', () => {
   if (!Auth.requiereLogin()) return;
   
   const config = BusConfig.obtener();
@@ -34,7 +28,6 @@ document.addEventListener('DOMContentLoaded', async () => {
   let dnisRegistrados = new Set();
   let asistencias = [];
   
-  // Recuperar asistencias previas si hay (sobrevive refresh)
   const previas = sessionStorage.getItem('planta_asistencias');
   if (previas) {
     try {
@@ -43,7 +36,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     } catch (e) {}
   }
   
-  // Mostrar info de la sesion
   document.getElementById('lblRuta').textContent = config.ruta;
   document.getElementById('lblBus').textContent = config.codigoBus;
   document.getElementById('lblPlaca').textContent = config.placa;
@@ -67,28 +59,34 @@ document.addEventListener('DOMContentLoaded', async () => {
     window.location.href = 'config.html';
   });
   
-  await API.ping();
+  API.ping().catch(e => console.warn('Warm-up fallo:', e));
   cardPreparando.style.display = 'none';
   iniciarCamara();
   
   function iniciarCamara() {
     reader.style.display = 'block';
-    const html5QrCode = new Html5Qrcode("reader");
-    const cfgQr = { fps: 10, qrbox: { width: 250, height: 250 }, aspectRatio: 1.0 };
-    html5QrCode.start(
-      { facingMode: "environment" },
-      cfgQr,
-      onScanSuccess,
-      function() {}
-    ).catch(err => alert('Error camara: ' + err));
+    try {
+      const html5QrCode = new Html5Qrcode("reader");
+      const cfgQr = { fps: 10, qrbox: { width: 250, height: 250 }, aspectRatio: 1.0 };
+      html5QrCode.start(
+        { facingMode: "environment" },
+        cfgQr,
+        onScanSuccess,
+        function() {}
+      ).catch(err => {
+        console.error('Error camara:', err);
+        alert('Error al iniciar la camara: ' + err);
+      });
+    } catch (e) {
+      console.error('Error html5-qrcode:', e);
+      alert('Error: la libreria de QR no cargo. Recarga (Ctrl+F5).');
+    }
   }
   
   async function onScanSuccess(decodedText) {
     if (procesando) return;
-    
     const dni = String(decodedText).trim().padStart(8, '0');
     const ahora = Date.now();
-    
     if (dni === ultimoDni && (ahora - ultimoTimestamp) < 3000) return;
     
     ultimoDni = dni;
@@ -101,14 +99,21 @@ document.addEventListener('DOMContentLoaded', async () => {
     cardError.style.display = 'none';
     cardBuscando.style.display = 'block';
     
-    const resp = await API.validarTrabajador(dni);
+    const timeoutPromise = new Promise(resolve => 
+      setTimeout(() => resolve({ ok: false, error: 'Timeout: backend tardo demasiado' }), 8000)
+    );
+    
+    const resp = await Promise.race([
+      API.validarTrabajador(dni),
+      timeoutPromise
+    ]);
+    
     cardBuscando.style.display = 'none';
     
     if (resp.ok) {
-      // Si ya estaba registrado, avisar pero no duplicar
       if (dnisRegistrados.has(resp.trabajador.dni)) {
         mostrarError('Este trabajador ya fue escaneado en esta sesion');
-        beep(440, 200, 0.15); // tono mas grave (advertencia)
+        beep(440, 200, 0.15);
       } else {
         dnisRegistrados.add(resp.trabajador.dni);
         asistencias.push({
@@ -121,13 +126,12 @@ document.addEventListener('DOMContentLoaded', async () => {
         sessionStorage.setItem('planta_asistencias', JSON.stringify(asistencias));
         mostrarTrabajador(resp.trabajador);
         actualizarContador();
-        beep(880, 120, 0.2); // tono OK
+        beep(880, 120, 0.2);
       }
     } else {
       mostrarError(resp.error || 'No encontrado');
-      beep(220, 300, 0.2); // tono error grave
+      beep(220, 300, 0.2);
     }
-    
     procesando = false;
   }
   
@@ -144,7 +148,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     document.getElementById('lblRutaTrab').textContent = t.ruta || 'SIN RUTA';
     document.getElementById('lblZona').textContent = t.zona || '-';
     document.getElementById('lblEmpresaTrab').textContent = t.empresa || '-';
-    
     const warning = document.getElementById('lblWarningRuta');
     if (t.ruta && t.ruta.toUpperCase() !== config.ruta.toUpperCase()) {
       warning.style.display = 'inline';
@@ -161,27 +164,19 @@ document.addEventListener('DOMContentLoaded', async () => {
   async function finalizar() {
     if (!asistencias.length) return;
     if (!confirm('Guardar ' + asistencias.length + ' asistencias?')) return;
-    
     btnFinalizar.disabled = true;
     btnFinalizar.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Guardando...';
-    
     const resp = await API.registrarAsistencias(asistencias, config);
-    
     if (!resp.ok) {
       alert('Error al guardar: ' + (resp.error || 'desconocido'));
       btnFinalizar.disabled = false;
       btnFinalizar.innerHTML = 'Finalizar y Guardar Asistencias';
       return;
     }
-    
-    // Limpiar local
     sessionStorage.removeItem('planta_asistencias');
-    
-    // Mensaje de exito
     const msg = 'Has registrado ' + resp.cantidad + ' asistencias de la ruta ' + 
                 resp.ruta + ' - codigo ' + resp.codigoBus + ' - fecha ' + resp.fecha;
     document.getElementById('lblMsgExito').textContent = msg;
-    
     const modal = new bootstrap.Modal(document.getElementById('modalExito'));
     modal.show();
   }
