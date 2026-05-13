@@ -106,12 +106,11 @@ function renderResumen(map) {
 function renderTablaAsist(data) {
   const tbody = document.getElementById('tblAsist');
   if (data.length === 0) {
-    tbody.innerHTML = '<tr><td colspan="9" class="text-center text-muted py-3">Sin asistencias en el periodo</td></tr>';
+    tbody.innerHTML = '<tr><td colspan="10" class="text-center text-muted py-3">Sin asistencias en el periodo</td></tr>';
     return;
   }
   tbody.innerHTML = data.map(a => 
-    '<tr>' +
-    '<td>' + escapeHtml(a.hora) + '</td>' +
+    '<tr>' + '<td>' + escapeHtml(a.fecha) + '</td>' + '<td>' + escapeHtml(a.hora) + '</td>' +
     '<td>' + escapeHtml(a.dni) + '</td>' +
     '<td>' + escapeHtml(a.nombre) + '</td>' +
     '<td><span class="badge bg-secondary">' + escapeHtml(a.empresa) + '</span></td>' +
@@ -127,7 +126,7 @@ function renderTablaAsist(data) {
 function renderTablaFalt(data) {
   const tbody = document.getElementById('tblFalt');
   if (data.length === 0) {
-    tbody.innerHTML = '<tr><td colspan="9" class="text-center text-muted py-3">Sin faltantes en el periodo</td></tr>';
+    tbody.innerHTML = '<tr><td colspan="10" class="text-center text-muted py-3">Sin faltantes en el periodo</td></tr>';
     return;
   }
   tbody.innerHTML = data.map(f => 
