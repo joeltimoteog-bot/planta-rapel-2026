@@ -58,6 +58,7 @@ document.addEventListener('DOMContentLoaded', () => {
   });
   
   API.ping().catch(e => console.warn('Warm-up fallo:', e));
+  API.validarTrabajador('00000000').catch(() => {});
   cardPreparando.style.display = 'none';
   iniciarCamara();
   
@@ -67,7 +68,7 @@ document.addEventListener('DOMContentLoaded', () => {
       const html5QrCode = new Html5Qrcode("reader");
       html5QrCode.start(
         { facingMode: "environment" },
-        { fps: 10, qrbox: { width: 250, height: 250 }, aspectRatio: 1.0 },
+        { fps: 25, qrbox: { width: 250, height: 250 }, aspectRatio: 1.0 },
         onScanSuccess,
         function() {}
       ).catch(err => { console.error(err); alert('Error camara: ' + err); });
@@ -78,10 +79,10 @@ document.addEventListener('DOMContentLoaded', () => {
     if (procesando) return;
     const dni = String(decodedText).trim().padStart(8, '0');
     const ahora = Date.now();
-    if (dni === ultimoDni && (ahora - ultimoTimestamp) < 3000) return;
+    if (dni === ultimoDni && (ahora - ultimoTimestamp) < 800) return;
     
     ultimoDni = dni; ultimoTimestamp = ahora; procesando = true;
-    if (navigator.vibrate) navigator.vibrate(80);
+    if (navigator.vibrate) navigator.vibrate(40); beep(660, 30, 0.1);
     
     cardResultado.style.display = 'none';
     cardDuplicado.style.display = 'none';
