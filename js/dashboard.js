@@ -106,16 +106,19 @@ function renderResumen(map) {
 function renderTablaAsist(data) {
   const tbody = document.getElementById('tblAsist');
   if (data.length === 0) {
-    tbody.innerHTML = '<tr><td colspan="10" class="text-center text-muted py-3">Sin asistencias en el periodo</td></tr>';
+    tbody.innerHTML = '<tr><td colspan="11" class="text-center text-muted py-3">Sin asistencias en el periodo</td></tr>';
     return;
   }
   tbody.innerHTML = data.map(a => 
-    '<tr>' + '<td>' + escapeHtml(a.fecha) + '</td>' + '<td>' + escapeHtml(a.hora) + '</td>' +
+    '<tr>' +
+    '<td>' + escapeHtml(a.fecha) + '</td>' +
+    '<td>' + escapeHtml(a.hora) + '</td>' +
     '<td>' + escapeHtml(a.dni) + '</td>' +
     '<td>' + escapeHtml(a.nombre) + '</td>' +
     '<td><span class="badge bg-secondary">' + escapeHtml(a.empresa) + '</span></td>' +
     '<td>' + escapeHtml(a.ruta_sesion) + '</td>' +
     '<td>' + escapeHtml(a.codigo_bus) + '</td>' +
+    '<td>' + escapeHtml(a.placa) + '</td>' +
     '<td>' + escapeHtml(a.turno) + '</td>' +
     '<td>' + escapeHtml(a.zona_packing) + '</td>' +
     '<td>' + escapeHtml(a.encargado_nombre) + '</td>' +
@@ -126,17 +129,19 @@ function renderTablaAsist(data) {
 function renderTablaFalt(data) {
   const tbody = document.getElementById('tblFalt');
   if (data.length === 0) {
-    tbody.innerHTML = '<tr><td colspan="10" class="text-center text-muted py-3">Sin faltantes en el periodo</td></tr>';
+    tbody.innerHTML = '<tr><td colspan="11" class="text-center text-muted py-3">Sin faltantes en el periodo</td></tr>';
     return;
   }
   tbody.innerHTML = data.map(f => 
     '<tr>' +
+    '<td>' + escapeHtml(f.fecha) + '</td>' +
     '<td>' + escapeHtml(f.hora) + '</td>' +
     '<td>' + escapeHtml(f.dni) + '</td>' +
     '<td>' + escapeHtml(f.nombre) + '</td>' +
     '<td><span class="badge bg-secondary">' + escapeHtml(f.empresa) + '</span></td>' +
     '<td>' + escapeHtml(f.ruta) + '</td>' +
     '<td>' + escapeHtml(f.codigo_bus) + '</td>' +
+    '<td>' + escapeHtml(f.placa) + '</td>' +
     '<td><span class="badge bg-danger">' + escapeHtml(f.motivo) + '</span></td>' +
     '<td>' + escapeHtml(f.observacion) + '</td>' +
     '<td>' + escapeHtml(f.encargado_nombre) + '</td>' +

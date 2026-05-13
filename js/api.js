@@ -29,5 +29,8 @@ const API = {
   validarTrabajador: (dni, empresa) => post({ accion: 'validarTrabajador', dni, empresa }),
   registrarAsistencias: (asistencias, sesion) => post({ accion: 'registrarAsistencias', asistencias, sesion: extraerSesion(sesion) }),
   registrarFaltantes: (faltantes, sesion) => post({ accion: 'registrarFaltantes', faltantes, sesion: extraerSesion(sesion) }),
-  getDashboard: (filtros) => post({ accion: 'getDashboard', filtros })
+  getDashboard: (filtros) => post({ accion: 'getDashboard', filtros }),
+  crearUsuario: (datos) => post({ accion: 'crearUsuario', datos }),
+  listarUsuarios: () => post({ accion: 'listarUsuarios' }),
+  cambiarEstadoUsuario: (id, activo) => post({ accion: 'cambiarEstadoUsuario', id, activo })
 };
