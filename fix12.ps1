@@ -1,4 +1,8 @@
-﻿function beep(freq, duration, volume) {
+cd C:\planta-rapel-2026
+$utf8 = [System.Text.UTF8Encoding]::new($true)
+
+$scannerJs = @'
+function beep(freq, duration, volume) {
   try {
     const ctx = new (window.AudioContext || window.webkitAudioContext)();
     const osc = ctx.createOscillator();
@@ -216,3 +220,20 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
 });
+'@
+
+[System.IO.File]::WriteAllText("C:\planta-rapel-2026\js\scanner.js", $scannerJs, $utf8)
+Write-Host "scanner.js OK" -ForegroundColor Green
+
+# Verificacion
+Write-Host ""
+Write-Host "Verificando que tiene la redireccion a faltantes:" -ForegroundColor Cyan
+Select-String -Path .\js\scanner.js -Pattern "faltantes.html"
+
+git add .
+git commit -m "Fix12: scanner.js con redireccion correcta a faltantes"
+git push
+
+Write-Host ""
+Write-Host "===== LISTO =====" -ForegroundColor Green
+Write-Host "Espera 30 seg, Ctrl+Shift+R, y prueba: escanear 3 de 5 esperados -> Finalizar" -ForegroundColor Cyan
