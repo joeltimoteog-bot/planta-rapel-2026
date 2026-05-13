@@ -1,4 +1,7 @@
-﻿document.addEventListener("DOMContentLoaded", function() {
+$utf8 = [System.Text.UTF8Encoding]::new($true)
+
+$loginJs = @'
+document.addEventListener("DOMContentLoaded", function() {
   console.log("[login] DOM listo");
   
   if (typeof API === "undefined") { console.error("API no cargado"); return; }
@@ -108,3 +111,16 @@ function procesarRespLogin(resp, msg) {
     }
   }, 600);
 }
+'@
+
+[System.IO.File]::WriteAllText("C:\planta-rapel-2026\js\login.js", $loginJs, $utf8)
+Write-Host "login.js reescrito limpio con console.log de diagnostico" -ForegroundColor Green
+
+$version = (Get-Date).ToString('yyyyMMdd-HHmmss')
+[System.IO.File]::WriteAllText("C:\planta-rapel-2026\version.json", "{`"version`": `"$version`"}", $utf8)
+
+git add .
+git commit -m "Login: reescribir limpio con diagnostico console.log"
+git push
+
+Write-Host "LISTO - prueba ahora con F12 Console abierto" -ForegroundColor Green
