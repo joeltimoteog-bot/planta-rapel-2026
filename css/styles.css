@@ -63,3 +63,15 @@ body.bg-login {
 #reader video {
   border-radius: 12px;
 }
+/* Force navbar logo size */
+.navbar .logo-nav {
+  height: 36px !important;
+  max-height: 36px !important;
+  width: auto !important;
+  max-width: 80px !important;
+  object-fit: contain;
+  vertical-align: middle;
+}
+.navbar .logo-nav-fallback {
+  vertical-align: middle;
+}
