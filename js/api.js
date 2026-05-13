@@ -16,6 +16,7 @@ async function post(payload) {
 }
 
 function extraerSesion(s) {
+  if (!s) return {};
   return {
     ruta: s.ruta, codigoBus: s.codigoBus, placa: s.placa,
     zonaPacking: s.zonaPacking, turno: s.turno,
