@@ -81,6 +81,7 @@ async function cargarDashboard() {
     document.getElementById('periodo').textContent = r.fechaInicio + ' al ' + r.fechaFin;
     
     document.getElementById('resPorRuta').innerHTML = renderResumen(r.porRuta);
+    renderCharts(r);
     document.getElementById('resFaltMotivo').innerHTML = renderResumen(r.faltantesPorMotivo);
     
     document.getElementById('cntAsist').textContent = asistenciasData.length;
@@ -186,4 +187,63 @@ function exportarExcel() {
 function escapeHtml(str) {
   if (str === null || str === undefined) return '';
   return String(str).replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
+}
+let chartRutaInst = null;
+let chartFaltInst = null;
+
+function renderCharts(resumen) {
+  if (typeof Chart === 'undefined') return;
+  
+  // Chart Asistencias por Ruta
+  const ctxR = document.getElementById('chartRuta');
+  if (ctxR) {
+    if (chartRutaInst) chartRutaInst.destroy();
+    const rutas = Object.keys(resumen.porRuta || {});
+    const valores = rutas.map(k => resumen.porRuta[k]);
+    chartRutaInst = new Chart(ctxR, {
+      type: 'bar',
+      data: {
+        labels: rutas,
+        datasets: [{
+          label: 'Asistencias',
+          data: valores,
+          backgroundColor: '#1a3a6c'
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: { legend: { display: false } },
+        scales: { y: { beginAtZero: true, ticks: { stepSize: 1 } } }
+      }
+    });
+  }
+  
+  // Chart Faltantes por Motivo
+  const ctxF = document.getElementById('chartFaltMotivo');
+  if (ctxF) {
+    if (chartFaltInst) chartFaltInst.destroy();
+    const motivos = Object.keys(resumen.faltantesPorMotivo || {});
+    if (motivos.length === 0) {
+      // Sin datos, limpiar
+      ctxF.parentElement.querySelector('canvas').style.opacity = 0.3;
+      return;
+    }
+    const valores = motivos.map(k => resumen.faltantesPorMotivo[k]);
+    chartFaltInst = new Chart(ctxF, {
+      type: 'doughnut',
+      data: {
+        labels: motivos,
+        datasets: [{
+          data: valores,
+          backgroundColor: ['#c8102e', '#ffc107', '#6c757d', '#1a3a6c', '#28a745']
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: { legend: { position: 'bottom' } }
+      }
+    });
+  }
 }

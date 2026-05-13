@@ -27,6 +27,8 @@ function extraerSesion(s) {
 const API = {
   ping: () => post({ accion: 'ping' }),
   login: (username, password) => post({ accion: 'login', username, password }),
+  loginPin: (pin) => post({ accion: 'loginPin', pin }),
+  actualizarPinUsuario: (id, pin) => post({ accion: 'actualizarPinUsuario', id, pin }),
   validarTrabajador: (dni, empresa) => post({ accion: 'validarTrabajador', dni, empresa }),
   registrarAsistencias: (asistencias, sesion) => post({ accion: 'registrarAsistencias', asistencias, sesion: extraerSesion(sesion) }),
   registrarFaltantes: (faltantes, sesion) => post({ accion: 'registrarFaltantes', faltantes, sesion: extraerSesion(sesion) }),

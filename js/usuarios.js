@@ -59,7 +59,7 @@ function renderTabla(data) {
       '<td>' + badgeRol + '</td>' +
       '<td>' + badgeEstado + '</td>' +
       '<td class="small">' + escapeHtml(u.fecha_creacion) + '</td>' +
-      '<td>' + btn + '</td>' +
+      '<td>' + btn + ' <button class="btn btn-sm btn-outline-warning ms-1" onclick="asignarPin(' + u.id + ', \'' + escapeHtml(u.username) + '\')">PIN</button></td>' +
       '</tr>';
   }).join('');
 }
@@ -132,4 +132,18 @@ function mostrarMsg(msg, tipo) {
 function escapeHtml(str) {
   if (str === null || str === undefined) return '';
   return String(str).replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
+}
+async function asignarPin(id, username) {
+  const pin = prompt('Asignar PIN de 4 digitos para "' + username + '":\n\n(Sera usado para que el encargado entre rapido al scanner)');
+  if (!pin) return;
+  if (!/^\d{4}$/.test(pin)) {
+    alert('PIN invalido. Deben ser 4 digitos numericos.');
+    return;
+  }
+  const resp = await API.actualizarPinUsuario(id, pin);
+  if (resp.ok) {
+    alert('PIN asignado correctamente a ' + username + '\nPIN: ' + pin);
+  } else {
+    alert('Error: ' + resp.error);
+  }
 }

@@ -8,6 +8,7 @@
 <script src="https://cdn.sheetjs.com/xlsx-0.20.1/package/dist/xlsx.full.min.js"></script>
 <link rel="stylesheet" href="css/styles.css">
 <script src="js/version-check.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 </head>
 <body>
 <nav class="navbar navbar-dark" style="background:#1a3a6c;">
@@ -126,6 +127,26 @@
         <div class="card-body py-2">
           <h6 class="fw-bold">Faltantes por Motivo</h6>
           <div id="resFaltMotivo" class="small"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Graficos -->
+  <div class="row g-2 mb-3">
+    <div class="col-md-6">
+      <div class="card">
+        <div class="card-body">
+          <h6 class="fw-bold mb-2">Asistencias por Ruta</h6>
+          <canvas id="chartRuta" height="200"></canvas>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-6">
+      <div class="card">
+        <div class="card-body">
+          <h6 class="fw-bold mb-2">Faltantes por Motivo</h6>
+          <canvas id="chartFaltMotivo" height="200"></canvas>
         </div>
       </div>
     </div>
