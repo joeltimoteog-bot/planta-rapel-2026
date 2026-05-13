@@ -1,4 +1,8 @@
-﻿<!DOCTYPE html>
+cd C:\planta-rapel-2026
+$utf8 = [System.Text.UTF8Encoding]::new($true)
+
+$indexHtml = @'
+<!DOCTYPE html>
 <html lang="es">
 <head>
 <meta charset="UTF-8">
@@ -181,3 +185,16 @@
 <script src="js/login.js"></script>
 </body>
 </html>
+'@
+
+[System.IO.File]::WriteAllText("C:\planta-rapel-2026\index.html", $indexHtml, $utf8)
+Write-Host "index.html OK - login centrado y sin parpadeo" -ForegroundColor Green
+
+$version = (Get-Date).ToString('yyyyMMdd-HHmmss')
+[System.IO.File]::WriteAllText("C:\planta-rapel-2026\version.json", "{`"version`": `"$version`"}", $utf8)
+
+git add .
+git commit -m "Login: rediseno centrado, negrita, sin parpadeo"
+git push
+
+Write-Host "LISTO" -ForegroundColor Green
