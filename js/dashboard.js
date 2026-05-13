@@ -17,7 +17,7 @@ document.addEventListener('DOMContentLoaded', () => {
   document.getElementById('fechaFin').value = hoy;
   
   document.getElementById('btnHome').addEventListener('click', () => window.location.href = 'home.html');
-  document.getElementById('btnSalir').addEventListener('click', () => { Auth.cerrarSesion(); window.location.href = 'index.html'; });
+  document.getElementById('btnSalir').addEventListener('click', () => { (function(){localStorage.removeItem('planta_usuario');localStorage.removeItem('usuario');sessionStorage.clear();})(); window.location.href = 'index.html'; });
   document.getElementById('btnAplicar').addEventListener('click', cargarDashboard);
   document.getElementById('btnHoy').addEventListener('click', () => { setRango(0, 0); cargarDashboard(); });
   document.getElementById('btnUltima7').addEventListener('click', () => { setRango(7, 0); cargarDashboard(); });
