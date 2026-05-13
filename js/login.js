@@ -72,7 +72,7 @@ function procesarRespLogin(resp, msg) {
   }
   
   // Guardar usuario
-  localStorage.setItem('planta_usuario', JSON.stringify(resp.usuario));
+  Auth.guardarSesion(resp.usuario);
   
   msg.textContent = 'Bienvenido, ' + (resp.usuario.nombre_completo || resp.usuario.username);
   msg.className = 'mt-2 small text-center text-success fw-bold';
