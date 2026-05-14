@@ -204,6 +204,25 @@ let chartRutaInst = null;
 let chartFaltInst = null;
 let chartZonaInst = null;
 
+// Paleta de colores variada para los graficos del dashboard
+const PALETA_CHARTS = [
+  '#1a3a6c', // azul Unifrutti
+  '#c8102e', // rojo Unifrutti
+  '#28a745', // verde
+  '#ffc107', // amarillo
+  '#fd7e14', // naranja
+  '#6f42c1', // violeta
+  '#20c997', // turquesa
+  '#e83e8c', // rosa fuerte
+  '#17a2b8', // celeste
+  '#6c757d', // gris medio
+  '#343a40', // gris oscuro
+  '#0dcaf0', // celeste claro
+  '#dc3545', // rojo brillante
+  '#198754', // verde oscuro
+  '#0d6efd'  // azul Bootstrap
+];
+
 function renderCharts(resumen) {
   if (typeof Chart === 'undefined') return;
   
@@ -220,7 +239,9 @@ function renderCharts(resumen) {
         datasets: [{
           label: 'Asistencias',
           data: valores,
-          backgroundColor: '#1a3a6c'
+          backgroundColor: rutas.map((_, i) => PALETA_CHARTS[i % PALETA_CHARTS.length]),
+          borderColor: rutas.map((_, i) => PALETA_CHARTS[i % PALETA_CHARTS.length]),
+          borderWidth: 1
         }]
       },
       options: {
@@ -249,7 +270,7 @@ function renderCharts(resumen) {
           labels: motivos,
           datasets: [{
             data: valores,
-            backgroundColor: ['#c8102e', '#ffc107', '#6c757d', '#1a3a6c', '#28a745']
+            backgroundColor: motivos.map((_, i) => PALETA_CHARTS[i % PALETA_CHARTS.length])
           }]
         },
         options: {
@@ -280,7 +301,9 @@ function renderCharts(resumen) {
         datasets: [{
           label: 'Asistencias',
           data: valoresZona,
-          backgroundColor: '#1a3a6c'
+          backgroundColor: zonas.map((_, i) => PALETA_CHARTS[i % PALETA_CHARTS.length]),
+          borderColor: zonas.map((_, i) => PALETA_CHARTS[i % PALETA_CHARTS.length]),
+          borderWidth: 1
         }]
       },
       options: {
