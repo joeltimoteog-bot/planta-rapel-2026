@@ -98,6 +98,9 @@ async function cargarDashboard() {
     
     renderTablaAsist(asistenciasData);
     renderTablaFalt(faltantesData);
+
+    // Comparativas de tendencia (hoy/ayer, mes actual/anterior)
+    cargarComparativas();
   } catch (e) {
     alert('Error de conexion: ' + e.message);
   } finally {
@@ -199,6 +202,7 @@ function escapeHtml(str) {
 }
 let chartRutaInst = null;
 let chartFaltInst = null;
+let chartZonaInst = null;
 
 function renderCharts(resumen) {
   if (typeof Chart === 'undefined') return;
@@ -237,23 +241,54 @@ function renderCharts(resumen) {
     if (motivos.length === 0) {
       // Sin datos, limpiar
       ctxF.parentElement.querySelector('canvas').style.opacity = 0.3;
-      return;
+    } else {
+      const valores = motivos.map(k => resumen.faltantesPorMotivo[k]);
+      chartFaltInst = new Chart(ctxF, {
+        type: 'doughnut',
+        data: {
+          labels: motivos,
+          datasets: [{
+            data: valores,
+            backgroundColor: ['#c8102e', '#ffc107', '#6c757d', '#1a3a6c', '#28a745']
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          animation: false,
+          plugins: { legend: { position: 'bottom' } }
+        }
+      });
     }
-    const valores = motivos.map(k => resumen.faltantesPorMotivo[k]);
-    chartFaltInst = new Chart(ctxF, {
-      type: 'doughnut',
+  }
+
+  // Chart Asistencias por Zona / Packing
+  const ctxZ = document.getElementById('chartZona');
+  if (ctxZ) {
+    if (chartZonaInst) chartZonaInst.destroy();
+    const porZona = {};
+    asistenciasData.forEach(a => {
+      const z = a.zona_packing || 'SIN ZONA';
+      porZona[z] = (porZona[z] || 0) + 1;
+    });
+    const zonas = Object.keys(porZona).sort();
+    const valoresZona = zonas.map(k => porZona[k]);
+    chartZonaInst = new Chart(ctxZ, {
+      type: 'bar',
       data: {
-        labels: motivos,
+        labels: zonas,
         datasets: [{
-          data: valores,
-          backgroundColor: ['#c8102e', '#ffc107', '#6c757d', '#1a3a6c', '#28a745']
+          label: 'Asistencias',
+          data: valoresZona,
+          backgroundColor: '#1a3a6c'
         }]
       },
       options: {
         responsive: true,
         maintainAspectRatio: false,
         animation: false,
-        plugins: { legend: { position: 'bottom' } }
+        plugins: { legend: { display: false } },
+        scales: { y: { beginAtZero: true, ticks: { stepSize: 1, precision: 0 } } }
       }
     });
   }
@@ -277,4 +312,81 @@ function poblarRutasDinamicas() {
   if (seleccionActual && rutas.indexOf(seleccionActual) !== -1) {
     select.value = seleccionActual;
   }
+}
+
+// Comparativas de tendencia: hoy vs ayer, mes actual vs mes anterior.
+// Hace 4 llamadas a API.getDashboard en paralelo (Promise.all).
+async function cargarComparativas() {
+  // Fecha local a ISO (yyyy-mm-dd) sin desfase de zona horaria
+  function isoLocal(d) {
+    const y = d.getFullYear();
+    const m = String(d.getMonth() + 1).padStart(2, '0');
+    const dia = String(d.getDate()).padStart(2, '0');
+    return y + '-' + m + '-' + dia;
+  }
+
+  const hoy = new Date();
+  const ayer = new Date(hoy); ayer.setDate(hoy.getDate() - 1);
+  const primerDiaMes = new Date(hoy.getFullYear(), hoy.getMonth(), 1);
+  const primerDiaMesAnt = new Date(hoy.getFullYear(), hoy.getMonth() - 1, 1);
+  const ultimoDiaMesAnt = new Date(hoy.getFullYear(), hoy.getMonth(), 0);
+
+  // Rangos en formato dd/MM/yyyy (igual que cargarDashboard)
+  const rangos = {
+    hoy:         { fechaInicio: isoADdMmYyyy(isoLocal(hoy)),            fechaFin: isoADdMmYyyy(isoLocal(hoy)) },
+    ayer:        { fechaInicio: isoADdMmYyyy(isoLocal(ayer)),           fechaFin: isoADdMmYyyy(isoLocal(ayer)) },
+    mesActual:   { fechaInicio: isoADdMmYyyy(isoLocal(primerDiaMes)),   fechaFin: isoADdMmYyyy(isoLocal(hoy)) },
+    mesAnterior: { fechaInicio: isoADdMmYyyy(isoLocal(primerDiaMesAnt)), fechaFin: isoADdMmYyyy(isoLocal(ultimoDiaMesAnt)) }
+  };
+
+  // Una llamada: devuelve { ok, total }. Nunca lanza (try/catch propio).
+  async function pedirTotal(rango) {
+    try {
+      const resp = await API.getDashboard({
+        fechaInicio: rango.fechaInicio,
+        fechaFin: rango.fechaFin,
+        ruta: '', turno: '', empresa: ''
+      });
+      if (resp && resp.ok && resp.resumen) {
+        return { ok: true, total: resp.resumen.totalAsistencias || 0 };
+      }
+      return { ok: false, total: 0 };
+    } catch (e) {
+      return { ok: false, total: 0 };
+    }
+  }
+
+  // Las 4 llamadas en paralelo
+  const [rHoy, rAyer, rMes, rMesAnt] = await Promise.all([
+    pedirTotal(rangos.hoy),
+    pedirTotal(rangos.ayer),
+    pedirTotal(rangos.mesActual),
+    pedirTotal(rangos.mesAnterior)
+  ]);
+
+  // Actualizar stats (si una llamada fallo, muestra "-" sin afectar las demas)
+  document.getElementById('statHoy').textContent    = rHoy.ok    ? rHoy.total    : '-';
+  document.getElementById('statAyer').textContent   = rAyer.ok   ? rAyer.total   : '-';
+  document.getElementById('statMes').textContent    = rMes.ok    ? rMes.total    : '-';
+  document.getElementById('statMesAnt').textContent = rMesAnt.ok ? rMesAnt.total : '-';
+
+  // Variacion porcentual
+  function mostrarVariacion(elId, actual, anterior, hayDatos) {
+    const el = document.getElementById(elId);
+    if (!el) return;
+    if (!hayDatos) { el.textContent = ''; el.style.color = ''; return; }
+    const variacion = ((actual - anterior) / Math.max(anterior, 1)) * 100;
+    if (variacion > 0) {
+      el.textContent = '↑ +' + variacion.toFixed(1) + '%';
+      el.style.color = '#28a745';
+    } else if (variacion < 0) {
+      el.textContent = '↓ ' + variacion.toFixed(1) + '%';
+      el.style.color = '#c8102e';
+    } else {
+      el.textContent = '= sin cambio';
+      el.style.color = '#6c757d';
+    }
+  }
+  mostrarVariacion('varHoy', rHoy.total, rAyer.total, rHoy.ok && rAyer.ok);
+  mostrarVariacion('varMes', rMes.total, rMesAnt.total, rMes.ok && rMesAnt.ok);
 }

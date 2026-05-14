@@ -113,6 +113,46 @@
     </div>
   </div>
 
+  <!-- Comparativas de tendencia: hoy/ayer, mes actual/anterior -->
+  <div class="row g-2 mb-3">
+    <div class="col-md-3">
+      <div class="card border-primary border-2">
+        <div class="card-body py-2 text-center">
+          <div class="small text-muted">Hoy</div>
+          <div class="fw-bold fs-4 text-primary" id="statHoy">-</div>
+          <div class="small fw-bold" id="varHoy"></div>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-3">
+      <div class="card border-secondary">
+        <div class="card-body py-2 text-center">
+          <div class="small text-muted">Ayer</div>
+          <div class="fw-bold fs-4" id="statAyer">-</div>
+          <div class="small text-muted">asistencias</div>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-3">
+      <div class="card border-success border-2">
+        <div class="card-body py-2 text-center">
+          <div class="small text-muted">Este mes</div>
+          <div class="fw-bold fs-4 text-success" id="statMes">-</div>
+          <div class="small fw-bold" id="varMes"></div>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-3">
+      <div class="card border-secondary">
+        <div class="card-body py-2 text-center">
+          <div class="small text-muted">Mes anterior</div>
+          <div class="fw-bold fs-4" id="statMesAnt">-</div>
+          <div class="small text-muted">asistencias</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <!-- Resumen detallado -->
   <div class="row g-2 mb-3">
     <div class="col-md-6">
@@ -148,6 +188,18 @@
         <div class="card-body">
           <h6 class="fw-bold mb-2">Faltantes por Motivo</h6>
           <div style="position:relative; height:240px;"><canvas id="chartFaltMotivo"></canvas></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Grafico Asistencias por Zona / Packing -->
+  <div class="row g-2 mb-3">
+    <div class="col-12">
+      <div class="card">
+        <div class="card-body">
+          <h6 class="fw-bold mb-2">Asistencias por Zona / Packing</h6>
+          <div style="position:relative; height:300px;"><canvas id="chartZona"></canvas></div>
         </div>
       </div>
     </div>
