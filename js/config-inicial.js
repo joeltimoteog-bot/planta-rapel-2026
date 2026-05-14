@@ -13,6 +13,9 @@
   document.getElementById('btnLogout').addEventListener('click', () => {
     if (confirm('Salir de la sesion?')) Auth.cerrarSesion();
   });
+  document.getElementById('btnInicio').addEventListener('click', () => {
+    window.location.href = 'home.html';
+  });
   
   inputDni.addEventListener('blur', async () => {
     const dni = inputDni.value.trim();

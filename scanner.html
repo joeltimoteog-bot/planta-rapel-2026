@@ -13,6 +13,7 @@
 <nav class="navbar navbar-dark" style="background:#1a3a6c;">
   <div class="container-fluid">
     <span><img src="assets/logo-unifrutti.png" alt="Unifrutti" class="logo-nav" onerror="this.style.display='none'; this.nextElementSibling.style.display='inline-block';"><span class="logo-nav-fallback" style="display:none;">UNIFRUTTI</span><span class="navbar-brand">Scanner QR</span></span>
+    <button class="btn btn-sm btn-light me-1" id="btnInicio">Inicio</button>
     <button class="btn btn-sm btn-light" id="btnNuevaSesion">Cambiar</button>
   </div>
 </nav>
@@ -105,14 +106,14 @@
   </div>
   
   <button id="btnFinalizar" class="btn btn-lg w-100 mt-3" style="display:none; background:#c8102e; color:white;">
-    Finalizar Sesi&oacute;n
+    Finalizar Registro
   </button>
 </div>
 
 <div class="modal fade" id="modalExito" tabindex="-1"><div class="modal-dialog modal-dialog-centered"><div class="modal-content">
-  <div class="modal-header bg-success text-white"><h5 class="modal-title">Sesi&oacute;n Finalizada</h5></div>
+  <div class="modal-header bg-success text-white"><h5 class="modal-title">Registro Finalizado</h5></div>
   <div class="modal-body"><p id="lblMsgExito"></p></div>
-  <div class="modal-footer"><button type="button" class="btn btn-primary" data-bs-dismiss="modal" onclick="sessionStorage.removeItem('planta_asistencias'); sessionStorage.removeItem('planta_pendientes'); window.location.href='config.html';">Nueva Sesi&oacute;n</button></div>
+  <div class="modal-footer"><button type="button" class="btn btn-primary" data-bs-dismiss="modal" onclick="sessionStorage.removeItem('planta_asistencias'); sessionStorage.removeItem('planta_pendientes'); window.location.href='config.html';">Nuevo Registro</button></div>
 </div></div></div>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>

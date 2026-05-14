@@ -307,7 +307,7 @@ document.addEventListener('DOMContentLoaded', () => {
       } else {
         alert('Error al reintentar: ' + (resp.error || 'desconocido'));
         btnFinalizar.disabled = false;
-        btnFinalizar.innerHTML = 'Finalizar Sesion';
+        btnFinalizar.innerHTML = 'Finalizar Registro';
         return;
       }
     }
@@ -319,7 +319,7 @@ document.addEventListener('DOMContentLoaded', () => {
       if (!confirm(msg)) return;
       window.location.href = 'faltantes.html?faltan=' + faltan;
     } else {
-      if (!confirm('Sesion completa con ' + asistencias.length + ' asistencias. Finalizar?')) return;
+      if (!confirm('Registro completo con ' + asistencias.length + ' asistencias. Finalizar?')) return;
       const fechaHoy = new Date().toLocaleDateString('es-PE');
       const msgFinal = 'Has registrado ' + asistencias.length + ' asistencias de la ruta ' +
                   config.ruta + ' - codigo ' + config.codigoBus + ' - fecha ' + fechaHoy;
