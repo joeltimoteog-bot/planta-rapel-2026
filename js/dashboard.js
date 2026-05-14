@@ -257,3 +257,23 @@ function renderCharts(resumen) {
     });
   }
 }
+
+// Pobla el select de rutas con las rutas presentes en los datos cargados
+function poblarRutasDinamicas() {
+  const select = document.getElementById('filtroRuta');
+  if (!select) return;
+  const seleccionActual = select.value;
+  const rutasSet = new Set();
+  (asistenciasData || []).forEach(a => {
+    if (a && a.ruta_sesion) rutasSet.add(String(a.ruta_sesion).trim().toUpperCase());
+  });
+  (faltantesData || []).forEach(f => {
+    if (f && f.ruta) rutasSet.add(String(f.ruta).trim().toUpperCase());
+  });
+  const rutas = Array.from(rutasSet).filter(r => r).sort();
+  select.innerHTML = '<option value="">Todas</option>' +
+    rutas.map(r => '<option value="' + escapeHtml(r) + '">' + escapeHtml(r) + '</option>').join('');
+  if (seleccionActual && rutas.indexOf(seleccionActual) !== -1) {
+    select.value = seleccionActual;
+  }
+}

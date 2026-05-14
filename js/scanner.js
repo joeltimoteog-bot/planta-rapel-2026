@@ -315,13 +315,18 @@ document.addEventListener('DOMContentLoaded', () => {
         return;
       }
     }
-    const faltan = config.cantidadAsistente - asistencias.length;
-    if (faltan > 0) {
+    const faltantesDelBus = Math.max(0, config.cantidadAsistente - asistencias.length);
+    const ausentesConfig = parseInt(config.cantidadAusente) || 0;
+    const totalFaltantesRegistrar = faltantesDelBus + ausentesConfig;
+    if (totalFaltantesRegistrar > 0) {
       const msg = 'Asistencias: ' + asistencias.length + '\n' +
                   'Esperados: ' + config.cantidadAsistente + '\n' +
-                  'Faltan: ' + faltan + '\n\n' + 'Ir a registrar los faltantes?';
+                  'Faltantes del bus: ' + faltantesDelBus + '\n' +
+                  'Ausentes configurados: ' + ausentesConfig + '\n' +
+                  'Total a registrar: ' + totalFaltantesRegistrar + '\n\n' +
+                  'Ir a registrar los faltantes?';
       if (!confirm(msg)) return;
-      window.location.href = 'faltantes.html?faltan=' + faltan;
+      window.location.href = 'faltantes.html?faltan=' + totalFaltantesRegistrar;
     } else {
       if (!confirm('Registro completo con ' + asistencias.length + ' asistencias. Finalizar?')) return;
       const fechaHoy = new Date().toLocaleDateString('es-PE');

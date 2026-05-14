@@ -74,9 +74,19 @@
           
           <div class="mb-3">
             <label class="form-label small fw-bold">Cantidad de personal asistente</label>
-            <input type="number" class="form-control" id="cantidad" placeholder="Ej: 50" min="1" max="200" required>
+            <input type="number" class="form-control" id="cantidad" placeholder="Ej: 45" min="1" max="200" enterkeyhint="next" required>
           </div>
-          
+
+          <div class="mb-3">
+            <label class="form-label small fw-bold">Cantidad de personal ausente</label>
+            <input type="number" class="form-control" id="cantidadAusente" placeholder="0" min="0" max="100" value="0" enterkeyhint="next">
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label small fw-bold">Total de personal programado</label>
+            <input type="number" class="form-control" id="cantidadTotal" readonly tabindex="-1" style="background:#e9ecef; font-weight:bold; font-size:1.2rem;">
+          </div>
+
           <hr class="my-3">
           
           <div class="mb-3">
