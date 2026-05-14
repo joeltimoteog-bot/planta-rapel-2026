@@ -40,6 +40,10 @@ document.addEventListener('DOMContentLoaded', () => {
   document.getElementById('lblZonaPacking').textContent = config.zonaPacking;
   document.getElementById('lblEncargado').textContent = config.encargadoNombre;
   document.getElementById('cantidadEsperada').textContent = config.cantidadAsistente;
+  const elAus = document.getElementById('lblCantAusente');
+  const elTot = document.getElementById('lblCantTotal');
+  if (elAus) elAus.textContent = config.cantidadAusente || 0;
+  if (elTot) elTot.textContent = config.cantidadTotal || config.cantidadAsistente;
 
   const cardPreparando = document.getElementById('cardPreparando');
   const cardBuscando = document.getElementById('cardBuscando');

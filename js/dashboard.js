@@ -80,6 +80,14 @@ async function cargarDashboard() {
     document.getElementById('pctAsist').textContent = total > 0 ? Math.round((r.totalAsistencias / total) * 100) + '%' : '-';
     document.getElementById('periodo').textContent = r.fechaInicio + ' al ' + r.fechaFin;
     
+    // Total Programado = Asistencias + Faltantes
+    const totalProg = r.totalAsistencias + r.totalFaltantes;
+    const elTP = document.getElementById('totalProgramado');
+    if (elTP) elTP.textContent = totalProg;
+    
+    // Poblar select de rutas dinamicamente
+    poblarRutasDinamicas();
+    
     document.getElementById('resPorRuta').innerHTML = renderResumen(r.porRuta);
     renderCharts(r);
     document.getElementById('resFaltMotivo').innerHTML = renderResumen(r.faltantesPorMotivo);

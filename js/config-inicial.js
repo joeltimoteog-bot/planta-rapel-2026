@@ -10,6 +10,46 @@
   
   let encargadoValidado = null;
   
+  // ==== AUTO-FOCUS SECUENCIAL ====
+  function setFocusSiguiente(currentId, nextId) {
+    const el = document.getElementById(currentId);
+    if (!el) return;
+    if (el.tagName === 'SELECT') {
+      el.addEventListener('change', () => {
+        if (el.value) {
+          const next = document.getElementById(nextId);
+          if (next) setTimeout(() => next.focus(), 50);
+        }
+      });
+    } else {
+      el.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') {
+          e.preventDefault();
+          if (el.value.trim()) {
+            const next = document.getElementById(nextId);
+            if (next) next.focus();
+          }
+        }
+      });
+    }
+  }
+  setFocusSiguiente('zonaPacking', 'turno');
+  setFocusSiguiente('turno', 'ruta');
+  setFocusSiguiente('ruta', 'codigoBus');
+  setFocusSiguiente('codigoBus', 'placa');
+  setFocusSiguiente('placa', 'cantidad');
+  setFocusSiguiente('cantidad', 'cantidadAusente');
+  setFocusSiguiente('cantidadAusente', 'dniEncargado');
+  
+  // ==== CALCULO AUTOMATICO DEL TOTAL ====
+  function calcularTotal() {
+    const a = parseInt(document.getElementById('cantidad').value) || 0;
+    const u = parseInt(document.getElementById('cantidadAusente').value) || 0;
+    document.getElementById('cantidadTotal').value = a + u;
+  }
+  document.getElementById('cantidad').addEventListener('input', calcularTotal);
+  document.getElementById('cantidadAusente').addEventListener('input', calcularTotal);
+  
   document.getElementById('btnLogout').addEventListener('click', () => {
     if (confirm('Salir de la sesion?')) Auth.cerrarSesion();
   });
