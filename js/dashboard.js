@@ -223,6 +223,48 @@ const PALETA_CHARTS = [
   '#0d6efd'  // azul Bootstrap
 ];
 
+// Plugin inline: dibuja el numero encima de cada barra (sin dependencias externas)
+const datalabelsPlugin = {
+  id: 'datalabels',
+  afterDatasetsDraw(chart) {
+    const { ctx } = chart;
+    chart.data.datasets.forEach((dataset, i) => {
+      const meta = chart.getDatasetMeta(i);
+      if (meta.hidden) return;
+      meta.data.forEach((bar, index) => {
+        const value = dataset.data[index];
+        if (value === 0 || value == null) return;
+        ctx.fillStyle = '#000';
+        ctx.font = 'bold 11px sans-serif';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'bottom';
+        ctx.fillText(value, bar.x, bar.y - 4);
+      });
+    });
+  }
+};
+
+// Plugin inline: dibuja el numero dentro de cada segmento del donut
+const datalabelsDoughnut = {
+  id: 'datalabelsDoughnut',
+  afterDatasetsDraw(chart) {
+    const { ctx } = chart;
+    chart.data.datasets.forEach((dataset, i) => {
+      const meta = chart.getDatasetMeta(i);
+      meta.data.forEach((arc, index) => {
+        const value = dataset.data[index];
+        if (!value) return;
+        const pos = arc.tooltipPosition();
+        ctx.fillStyle = '#fff';
+        ctx.font = 'bold 14px sans-serif';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText(value, pos.x, pos.y);
+      });
+    });
+  }
+};
+
 function renderCharts(resumen) {
   if (typeof Chart === 'undefined') return;
   
@@ -230,8 +272,10 @@ function renderCharts(resumen) {
   const ctxR = document.getElementById('chartRuta');
   if (ctxR) {
     if (chartRutaInst) chartRutaInst.destroy();
-    const rutas = Object.keys(resumen.porRuta || {});
-    const valores = rutas.map(k => resumen.porRuta[k]);
+    const rutasOrdenadas = Object.entries(resumen.porRuta || {})
+      .sort((a, b) => b[1] - a[1]);
+    const rutas = rutasOrdenadas.map(e => e[0]);
+    const valores = rutasOrdenadas.map(e => e[1]);
     chartRutaInst = new Chart(ctxR, {
       type: 'bar',
       data: {
@@ -250,7 +294,8 @@ function renderCharts(resumen) {
         animation: false,
         plugins: { legend: { display: false } },
         scales: { y: { beginAtZero: true, ticks: { stepSize: 1 } } }
-      }
+      },
+      plugins: [datalabelsPlugin]
     });
   }
   
@@ -270,15 +315,27 @@ function renderCharts(resumen) {
           labels: motivos,
           datasets: [{
             data: valores,
-            backgroundColor: motivos.map((_, i) => PALETA_CHARTS[i % PALETA_CHARTS.length])
+            backgroundColor: motivos.map((_, i) => PALETA_CHARTS[i % PALETA_CHARTS.length]),
+            borderColor: '#ffffff',
+            borderWidth: 3,
+            hoverOffset: 15
           }]
         },
         options: {
           responsive: true,
           maintainAspectRatio: false,
           animation: false,
-          plugins: { legend: { position: 'bottom' } }
-        }
+          plugins: {
+            legend: {
+              position: 'bottom',
+              labels: {
+                font: { weight: 'bold', size: 12 },
+                padding: 12
+              }
+            }
+          }
+        },
+        plugins: [datalabelsDoughnut]
       });
     }
   }
@@ -292,17 +349,18 @@ function renderCharts(resumen) {
       const z = a.zona_packing || 'SIN ZONA';
       porZona[z] = (porZona[z] || 0) + 1;
     });
-    const zonas = Object.keys(porZona).sort();
-    const valoresZona = zonas.map(k => porZona[k]);
+    const zonaEntries = Object.entries(porZona).sort((a, b) => b[1] - a[1]);
+    const zonasOrd = zonaEntries.map(e => e[0]);
+    const valoresZona = zonaEntries.map(e => e[1]);
     chartZonaInst = new Chart(ctxZ, {
       type: 'bar',
       data: {
-        labels: zonas,
+        labels: zonasOrd,
         datasets: [{
           label: 'Asistencias',
           data: valoresZona,
-          backgroundColor: zonas.map((_, i) => PALETA_CHARTS[i % PALETA_CHARTS.length]),
-          borderColor: zonas.map((_, i) => PALETA_CHARTS[i % PALETA_CHARTS.length]),
+          backgroundColor: zonasOrd.map((_, i) => PALETA_CHARTS[i % PALETA_CHARTS.length]),
+          borderColor: zonasOrd.map((_, i) => PALETA_CHARTS[i % PALETA_CHARTS.length]),
           borderWidth: 1
         }]
       },
@@ -312,7 +370,8 @@ function renderCharts(resumen) {
         animation: false,
         plugins: { legend: { display: false } },
         scales: { y: { beginAtZero: true, ticks: { stepSize: 1, precision: 0 } } }
-      }
+      },
+      plugins: [datalabelsPlugin]
     });
   }
 }
