@@ -11,6 +11,61 @@
   } catch (e) {}
 }
 
+// Patrones de sonido + vibracion diferenciados por evento del scanner.
+// tipo: 'tick' | 'ok' | 'duplicado' | 'error'
+function sonarPatron(tipo) {
+  // --- Vibracion ---
+  try {
+    if (navigator.vibrate) {
+      if (tipo === 'tick') navigator.vibrate(40);
+      else if (tipo === 'ok') navigator.vibrate(80);
+      else if (tipo === 'duplicado') navigator.vibrate([100, 50, 100, 50, 100]);
+      else if (tipo === 'error') navigator.vibrate(200);
+    }
+  } catch (e) {}
+
+  // --- Sonido ---
+  try {
+    const ctx = new (window.AudioContext || window.webkitAudioContext)();
+    const inicio = ctx.currentTime;
+    let finMs = 150;
+
+    function tono(freqIni, freqFin, startMs, durMs, vol, fadeOut) {
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.connect(gain); gain.connect(ctx.destination);
+      osc.type = 'sine';
+      const t0 = inicio + startMs / 1000;
+      const t1 = t0 + durMs / 1000;
+      osc.frequency.setValueAtTime(freqIni, t0);
+      if (freqFin) osc.frequency.linearRampToValueAtTime(freqFin, t1);
+      gain.gain.setValueAtTime(vol, t0);
+      if (fadeOut) gain.gain.exponentialRampToValueAtTime(0.0001, t1);
+      osc.start(t0);
+      osc.stop(t1);
+      if (startMs + durMs > finMs) finMs = startMs + durMs;
+    }
+
+    if (tipo === 'tick') {
+      // Deteccion inicial del QR: tick corto y discreto
+      tono(660, null, 0, 30, 0.1, false);
+    } else if (tipo === 'ok') {
+      // Registro OK: 2 tonos ascendentes DO -> MI (80ms c/u, 30ms entre medio)
+      tono(523, null, 0, 80, 0.2, false);
+      tono(659, null, 110, 80, 0.2, false);
+    } else if (tipo === 'duplicado') {
+      // Ya registrado: doble beep grave llamativo (150ms c/u, 80ms de pausa)
+      tono(350, null, 0, 150, 0.3, false);
+      tono(350, null, 230, 150, 0.3, false);
+    } else if (tipo === 'error') {
+      // No encontrado / error: beep grave largo descendente con fade out
+      tono(220, 150, 0, 350, 0.3, true);
+    }
+
+    setTimeout(() => { try { ctx.close(); } catch (e) {} }, finMs + 120);
+  } catch (e) {}
+}
+
 document.addEventListener('DOMContentLoaded', () => {
   if (!Auth.requiereLogin()) return;
   const config = BusConfig.obtener();
@@ -149,8 +204,7 @@ document.addEventListener('DOMContentLoaded', () => {
       asistencias.push(nuevaAsist);
       sessionStorage.setItem('planta_asistencias', JSON.stringify(asistencias));
       actualizarContador();
-      beep(880, 120, 0.2);
-      if (navigator.vibrate) navigator.vibrate(80);
+      sonarPatron('ok');
       guardarAsistenciaIndividual(nuevaAsist);
       bootstrap.Modal.getInstance(document.getElementById('modalManual')).hide();
     });
@@ -195,7 +249,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (dni === ultimoDni && (ahora - ultimoTimestamp) < 800) return;
 
     ultimoDni = dni; ultimoTimestamp = ahora; procesando = true;
-    if (navigator.vibrate) navigator.vibrate(40); beep(660, 30, 0.1);
+    sonarPatron('tick');
 
     cardResultado.style.display = 'none';
     cardDuplicado.style.display = 'none';
@@ -212,8 +266,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (resp.ok) {
       if (dnisRegistrados.has(resp.trabajador.dni)) {
         mostrarDuplicado(resp.trabajador);
-        beep(440, 400, 0.3);
-        if (navigator.vibrate) navigator.vibrate([100, 50, 100, 50, 100]);
+        sonarPatron('duplicado');
       } else {
         const nuevaAsistencia = {
           dni: resp.trabajador.dni,
@@ -227,12 +280,12 @@ document.addEventListener('DOMContentLoaded', () => {
         sessionStorage.setItem('planta_asistencias', JSON.stringify(asistencias));
         mostrarTrabajador(resp.trabajador);
         actualizarContador();
-        beep(880, 120, 0.2);
+        sonarPatron('ok');
         guardarAsistenciaIndividual(nuevaAsistencia);
       }
     } else {
       mostrarError(resp.error || 'No encontrado');
-      beep(220, 300, 0.2);
+      sonarPatron('error');
     }
     procesando = false;
   }

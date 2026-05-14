@@ -73,6 +73,7 @@
   <div class="card">
     <div class="card-header" style="background:#1a3a6c; color:white;"><strong>Usuarios Registrados</strong></div>
     <div class="card-body">
+      <button class="btn btn-primary mb-2" id="btnPinsMasivos">Asignar PINs Automaticos</button>
       <input type="text" class="form-control form-control-sm mb-2" id="buscador" placeholder="Buscar por usuario o nombre...">
       <div class="table-responsive">
         <table class="table table-sm table-hover">
@@ -84,6 +85,46 @@
           </thead>
           <tbody id="tblUsuarios"></tbody>
         </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal: Asignacion masiva de PINs -->
+<div class="modal fade" id="modalPinsMasivos" tabindex="-1">
+  <div class="modal-dialog modal-dialog-centered modal-lg">
+    <div class="modal-content">
+      <div class="modal-header" style="background:#1a3a6c; color:white;">
+        <h5 class="modal-title">Asignacion masiva de PINs</h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        <p class="mb-2">Esto asignara PINs secuenciales a todos los encargados sin PIN.</p>
+        <div class="row g-2 align-items-end mb-2">
+          <div class="col-auto">
+            <label class="form-label small mb-1">PIN inicial</label>
+            <input type="number" class="form-control" id="iPinInicial" value="1001" min="1000" max="9999" style="width:130px;">
+          </div>
+          <div class="col-auto">
+            <button class="btn btn-primary" id="btnAsignarPins">Asignar</button>
+          </div>
+        </div>
+        <div id="msgPinsMasivos" class="small"></div>
+        <div id="resultadoPinsMasivos" class="mt-3" style="display:none;">
+          <div class="d-flex justify-content-between align-items-center mb-1">
+            <strong>PINs asignados:</strong>
+            <button class="btn btn-sm btn-outline-secondary" onclick="window.print()">Imprimir lista</button>
+          </div>
+          <div class="table-responsive">
+            <table class="table table-sm table-bordered">
+              <thead style="background:#1a3a6c; color:white;"><tr><th>DNI</th><th>Nombre</th><th>PIN</th></tr></thead>
+              <tbody id="tblPinsAsignados"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
       </div>
     </div>
   </div>

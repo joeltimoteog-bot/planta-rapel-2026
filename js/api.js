@@ -35,5 +35,6 @@ const API = {
   getDashboard: (filtros) => post({ accion: 'getDashboard', filtros }),
   crearUsuario: (datos) => post({ accion: 'crearUsuario', datos }),
   listarUsuarios: () => post({ accion: 'listarUsuarios' }),
-  cambiarEstadoUsuario: (id, activo) => post({ accion: 'cambiarEstadoUsuario', id, activo })
+  cambiarEstadoUsuario: (id, activo) => post({ accion: 'cambiarEstadoUsuario', id, activo }),
+  asignarPinsMasivos: (pinInicial) => post({ accion: 'asignarPinsMasivos', pinInicial })
 };

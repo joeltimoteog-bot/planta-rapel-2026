@@ -22,7 +22,9 @@ document.addEventListener('DOMContentLoaded', () => {
   });
   document.getElementById('btnCrear').addEventListener('click', crearUsuario);
   document.getElementById('buscador').addEventListener('input', (e) => filtrarTabla(e.target.value));
-  
+  document.getElementById('btnPinsMasivos').addEventListener('click', abrirModalPinsMasivos);
+  document.getElementById('btnAsignarPins').addEventListener('click', asignarPinsMasivos);
+
   cargarUsuarios();
 });
 
@@ -146,4 +148,65 @@ async function asignarPin(id, username) {
   } else {
     alert('Error: ' + resp.error);
   }
+}
+
+// ===== ASIGNACION MASIVA DE PINs =====
+function abrirModalPinsMasivos() {
+  const msg = document.getElementById('msgPinsMasivos');
+  msg.textContent = '';
+  msg.className = 'small';
+  document.getElementById('resultadoPinsMasivos').style.display = 'none';
+  document.getElementById('tblPinsAsignados').innerHTML = '';
+  document.getElementById('iPinInicial').value = '1001';
+  const modal = new bootstrap.Modal(document.getElementById('modalPinsMasivos'));
+  modal.show();
+}
+
+async function asignarPinsMasivos() {
+  const msg = document.getElementById('msgPinsMasivos');
+  const cont = document.getElementById('resultadoPinsMasivos');
+  const tbody = document.getElementById('tblPinsAsignados');
+  const pinInicial = parseInt(document.getElementById('iPinInicial').value, 10);
+
+  if (isNaN(pinInicial) || pinInicial < 1000 || pinInicial > 9999) {
+    msg.textContent = 'PIN inicial invalido. Debe ser un numero de 4 digitos (1000-9999).';
+    msg.className = 'small text-danger';
+    return;
+  }
+
+  if (!confirm('Asignar PINs secuenciales desde ' + pinInicial + ' a todos los encargados sin PIN?')) return;
+
+  const btn = document.getElementById('btnAsignarPins');
+  btn.disabled = true;
+  btn.textContent = 'Asignando...';
+  msg.textContent = 'Procesando...';
+  msg.className = 'small text-muted';
+
+  const resp = await API.asignarPinsMasivos(pinInicial);
+
+  btn.disabled = false;
+  btn.textContent = 'Asignar';
+
+  if (!resp.ok) {
+    msg.textContent = 'Error: ' + (resp.error || 'desconocido');
+    msg.className = 'small text-danger';
+    return;
+  }
+
+  const asignados = resp.asignados || [];
+  if (asignados.length === 0) {
+    msg.textContent = 'No habia encargados sin PIN. Nada que asignar.';
+    msg.className = 'small text-warning fw-bold';
+    cont.style.display = 'none';
+    return;
+  }
+
+  msg.textContent = 'Se asignaron ' + asignados.length + ' PINs correctamente.';
+  msg.className = 'small text-success fw-bold';
+  tbody.innerHTML = asignados.map(a =>
+    '<tr><td>' + escapeHtml(a.dni) + '</td><td>' + escapeHtml(a.nombre) +
+    '</td><td><strong>' + escapeHtml(a.pin) + '</strong></td></tr>'
+  ).join('');
+  cont.style.display = 'block';
+  cargarUsuarios();
 }
