@@ -160,13 +160,8 @@ document.addEventListener('DOMContentLoaded', () => {
         formatsToSupport: [Html5QrcodeSupportedFormats.QR_CODE]
       });
       html5QrCode.start(
-        // [PERF 2] Resolucion 1280x720 fija = menos carga de CPU en celulares modestos
-        {
-          facingMode: { ideal: "environment" },
-          width: { ideal: 1280 },
-          height: { ideal: 720 },
-          frameRate: { ideal: 25 }
-        },
+        // [PERF 2] Primer parametro solo facingMode (libreria acepta 1 key)
+        { facingMode: "environment" },
         {
           fps: 25,
           // [PERF 3] qrbox 70% del lado menor = solo analiza zona central (mas rapido)
@@ -174,7 +169,14 @@ document.addEventListener('DOMContentLoaded', () => {
             var size = Math.floor(Math.min(w, h) * 0.70);
             return { width: size, height: size };
           },
-          aspectRatio: 1.0
+          aspectRatio: 1.0,
+          // [PERF 2] videoConstraints aqui dentro (no en primer parametro)
+          videoConstraints: {
+            facingMode: { ideal: "environment" },
+            width: { ideal: 1280 },
+            height: { ideal: 720 },
+            frameRate: { ideal: 25 }
+          }
         },
         onScanSuccess,
         function() {}
