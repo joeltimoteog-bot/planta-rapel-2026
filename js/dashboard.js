@@ -4,9 +4,10 @@ let faltantesData = [];
 document.addEventListener('DOMContentLoaded', () => {
   if (!Auth.requiereLogin()) return;
   
-  const usuario = (function(){try{const r=localStorage.getItem('planta_usuario')||localStorage.getItem('usuario');return r?JSON.parse(r):null;}catch(e){return null;}})();
-  console.log('Usuario en localStorage:', usuario); if (usuario && usuario.rol && usuario.rol !== 'admin') {
-    alert('Solo administradores pueden ver el dashboard');
+  // Solo admins acceden al Dashboard. Defensivo: sin sesion o rol distinto de 'admin' -> fuera.
+  const usuario = Auth.obtenerSesion();
+  if (!usuario || usuario.rol !== 'admin') {
+    alert('Solo administradores pueden acceder al Dashboard');
     window.location.href = 'home.html';
     return;
   }

@@ -3,16 +3,14 @@
 document.addEventListener('DOMContentLoaded', () => {
   if (!Auth.requiereLogin()) return;
   
-  try {
-    const raw = localStorage.getItem('planta_usuario') || localStorage.getItem('usuario');
-    const u = raw ? JSON.parse(raw) : null;
-    if (u && u.rol && u.rol !== 'admin') {
-      alert('Solo administradores pueden gestionar usuarios');
-      window.location.href = 'home.html';
-      return;
-    }
-  } catch (e) {}
-  
+  // Solo admins acceden a Gestion de Usuarios. Defensivo: sin sesion o rol distinto de 'admin' -> fuera.
+  const usuario = Auth.obtenerSesion();
+  if (!usuario || usuario.rol !== 'admin') {
+    alert('Solo administradores pueden acceder a Gestion de Usuarios');
+    window.location.href = 'home.html';
+    return;
+  }
+
   document.getElementById('btnHome').addEventListener('click', () => window.location.href = 'home.html');
   document.getElementById('btnSalir').addEventListener('click', () => {
     localStorage.removeItem('planta_usuario');
